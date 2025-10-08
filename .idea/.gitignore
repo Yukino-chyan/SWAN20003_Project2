@@ -1,0 +1,40 @@
+# 默认忽略的文件
+/shelf/
+/workspace.xml
+# 基于编辑器的 HTTP 客户端请求
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# —— 编译/打包产物 ——
+/out/
+/bin/
+/build/
+/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# —— 反编译产物（若你用过 jd-gui/jadx 等） ——
+*-decompiled.java
+*.jad
+/jadx-output/
+/decompiled/
+/dump/
+
+# —— IDE/工具产生的文件 ——
+# IntelliJ / Android Studio
+.idea/
+*.iml
+# Eclipse
+.settings/
+.project
+.classpath
+# VS Code
+.vscode/
+
+# —— OS 垃圾文件 ——
+.DS_Store
+Thumbs.db
