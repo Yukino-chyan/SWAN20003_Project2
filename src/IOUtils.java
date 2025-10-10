@@ -67,7 +67,7 @@ public class IOUtils {
             double x = Double.parseDouble(xy[0]);
             double y = Double.parseDouble(xy[1]);
             Point center = new Point(x, y);
-            walls.add(new Wall(center));
+            walls.add(new Wall(center));  // 如果你的 Wall 需要 Image，请改成传入共享的贴图
         }
         return walls;
     }
