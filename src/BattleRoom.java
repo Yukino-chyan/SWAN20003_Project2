@@ -20,7 +20,8 @@ public class BattleRoom implements Room {
     private final List<River> rivers = new ArrayList<>();
     private List<BulletKin> bulletKins;
     private List<AshenBulletKin> ashenBulletKins;
-    BattleRoom(
+    private List<Fireball> fireballs =  new ArrayList<>();
+    public BattleRoom(
             Doors priDoor,Doors secDoor,
             List<TreasureBox> treasureBoxes,KeyBulletKin keyBulletKin,
             List<Wall> walls,List<River> rivers,
@@ -46,6 +47,7 @@ public class BattleRoom implements Room {
         for(TreasureBox t:treasureBoxes) if(!t.getOpen()) t.show();
         for(Wall w:walls) { w.show(); }
         for(River r : rivers) { r.show(); }
+        for(Fireball f : fireballs) { f.show(); }
         for(BulletKin bk : bulletKins) { bk.show(); }
         for(AshenBulletKin k : ashenBulletKins) k.show();
         if(gateDelay && keyBulletKin.isAlive()) keyBulletKin.show();
@@ -83,7 +85,28 @@ public class BattleRoom implements Room {
         for(TreasureBox t:treasureBoxes) { t.reset(); }
         gateDelay = false;
     }
+    public void shot(Player player){
+        for(BulletKin bk:bulletKins) {
+            if(bk.isAlive()){
+                if(bk.getCoolDown() == 0){
+                    fireballs.add(bk.shot(player));
+                    bk.setCoolDown(bk.getShotSpeed());
+                }
+                else bk.setCoolDown(bk.getCoolDown() - 1);
+            }
+        }
+        for(AshenBulletKin k:ashenBulletKins) {
+            if(k.isAlive()){
+                if(k.getCoolDown() == 0){
+                    fireballs.add(k.shot(player));
+                    k.setCoolDown(k.getShotSpeed());
+                }
+                else  k.setCoolDown(k.getCoolDown() - 1);
+            }
+        }
+    }
     public void move(){
         keyBulletKin.move();
+        for(Fireball fb:fireballs) { fb.move(); }
     }
 }

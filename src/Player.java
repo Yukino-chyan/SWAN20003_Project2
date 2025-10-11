@@ -166,6 +166,12 @@ public class Player {
         coin += tmp.getNum();
         messegeCoin.setNum(coin);
     }
+    public double getPosX(){
+        return playerPos.x;
+    }
+    public double getPosY(){
+        return playerPos.y;
+    }
     public double getHealth(){
         return health;
     }

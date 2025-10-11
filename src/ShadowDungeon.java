@@ -96,6 +96,8 @@ public class ShadowDungeon extends AbstractGame {
             if(input.isDown(Keys.R)){ player.setRobot(); }
             else if(input.isDown(Keys.M)){ player.setMarine(); }
         }
+        if(currentRoom == roomA) roomA.shot(player);
+        if(currentRoom == roomB) roomB.shot(player);
         if(currentRoom == roomA) roomA.move();
         if(currentRoom == roomB) roomB.move();
         player.setterBounds(player.getPlayerPos(input));
