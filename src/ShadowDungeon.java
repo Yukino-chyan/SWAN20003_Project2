@@ -37,7 +37,9 @@ public class ShadowDungeon extends AbstractGame {
                 Integer.parseInt(GAME_PROPS.getProperty("initialCoins")),
                 Integer.parseInt(GAME_PROPS.getProperty("initialHealth")),
                 Integer.parseInt(GAME_PROPS.getProperty("movingSpeed")),
-                GAME_PROPS,MESSAGE_PROPS);
+                GAME_PROPS,MESSAGE_PROPS,
+                new Image("res/player_left.png"),new Image("res/player_right.png"),
+                Double.parseDouble(GAME_PROPS.getProperty("riverDamagePerFrame")), 0);
         //Create the prepRoom object
         Doors tmp = IOUtils.parseDoors(GAME_PROPS.getProperty("door.prep"));
         Point restartPos = IOUtils.parseCoords(GAME_PROPS.getProperty("restartarea.prep"));
@@ -85,8 +87,10 @@ public class ShadowDungeon extends AbstractGame {
         List<Wall> solid = new ArrayList<>();
         if(currentRoom == roomA) solid = roomA.getWalls();
         if(currentRoom == roomB) solid = roomB.getWalls();
-        if(input.isDown(Keys.R)){
+        if(input.isDown(Keys.R) || input.isDown(Keys.M)){
             prepRoom.getSecDoors().setterOpen();
+            if(input.isDown(Keys.R)){ player.setRobot(); }
+            else if(input.isDown(Keys.M)){ player.setMarine(); }
         }
         if(currentRoom == roomA) roomA.move();
         if(currentRoom == roomB) roomB.move();

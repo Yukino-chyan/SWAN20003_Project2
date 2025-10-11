@@ -9,17 +9,27 @@ import java.util.Properties;
 import static java.lang.Math.*;
 
 public class Player {
-    private final Image playerLeft = new Image("res/player_left.png");
-    private final Image playerRight = new Image("res/player_right.png");
+    private Image playerLeft;
+    private Image playerRight;
     private final Properties GAME_PROPS;
     private final Properties MESSAGE_PROPS;
     private int coin,speed;
     private double health,hurtPerFrame;
     private Rectangle bounds;
     private int win = 0;
-    Messege messegeCoin,messegeHealth;
+    private int key = 0;
+    private int weaponLevel = 0;
+    private int shotSpeed;
+    private int killCoin;
+    private double hurtPerShoot;
+    Messege messegeCoin,messegeHealth,messegeKey,messegeWeaponLevel;
     Point playerPos;
-    public Player (Point playerPos,int coin,int health,int speed,Properties GAME_PROPS,Properties MESSAGE_PROPS) {
+    public Player (
+            Point playerPos,int coin,int health,int speed,
+            Properties GAME_PROPS,Properties MESSAGE_PROPS,Image playerLeft,Image playerRight,
+            double hurtPerFrame,int killCoin) {
+        this.playerLeft = playerLeft;
+        this.playerRight = playerRight;
         this.playerPos = playerPos;
         this.coin = coin;
         this.health = health;
@@ -36,7 +46,8 @@ public class Player {
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
                 IOUtils.parseCoords(GAME_PROPS.getProperty("healthStat")), health, false
         );
-        hurtPerFrame = Double.parseDouble(GAME_PROPS.getProperty("riverDamagePerFrame"));
+        this.hurtPerFrame = hurtPerFrame;
+        this.killCoin = killCoin;
     }
     public void show(Input input){
         if(input.getMouseX()>playerPos.x){
@@ -149,5 +160,17 @@ public class Player {
         messegeCoin.setNum(coin);
         messegeHealth.setNum(health);
         win = 0;
+    }
+    public void setMarine(){
+        playerLeft = new Image("res/marine_left.png");
+        playerRight = new Image("res/marine_right.png");
+        hurtPerFrame = 0;
+        killCoin = 0;
+    }
+    public void setRobot(){
+        playerLeft = new Image("res/robot_left.png");
+        playerRight = new Image("res/robot_right.png");
+        hurtPerFrame = Double.parseDouble(GAME_PROPS.getProperty("riverDamagePerFrame"));
+        killCoin = Integer.parseInt(GAME_PROPS.getProperty("robotExtraCoin"));
     }
 }
