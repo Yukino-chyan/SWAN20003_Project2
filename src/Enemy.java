@@ -7,7 +7,7 @@ public abstract class Enemy {
     protected Boolean isalive = true;
     protected Image enemyImage;
     protected double health;
-    protected int shotSpeed,moveSpeed;
+    protected int shotSpeed,moveSpeed,killCoin;
     protected double contactHurt;
     protected Boolean haveKey;
     protected Rectangle rect;

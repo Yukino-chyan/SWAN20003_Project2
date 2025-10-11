@@ -15,6 +15,7 @@ public class KeyBulletKin extends Enemy {
         this.haveKey = true;
         this.health = Double.parseDouble(GAME_PROPS.getProperty("keyBulletKinHealth"));
         this.moveSpeed = Integer.parseInt(GAME_PROPS.getProperty("keyBulletKinSpeed"));
+        this.killCoin = 0;
         this.contactHurt = 0.2;
         this.pos = scale.get(0);
         this.rect = enemyImage.getBoundingBoxAt(pos);
@@ -22,12 +23,24 @@ public class KeyBulletKin extends Enemy {
     public void move(){
         if(pos.equals(scale.get(nextPos))){ nextPos++; }
         if(nextPos == scale.size()){ nextPos = 0; }
-        if(pos.x == scale.get(nextPos).x){
-            setterPosy(pos.y + moveSpeed * (( scale.get(nextPos).y - pos.y ) / abs(( scale.get(nextPos).y - pos.y ))));
+        double dx = scale.get(nextPos).x - pos.x;
+        double dy = scale.get(nextPos).y - pos.y;
+        double len = Math.sqrt(dx * dx + dy * dy);
+        dx /= len; dy /= len;
+        dx *= moveSpeed; dy *= moveSpeed;
+        if(pos.x < scale.get(nextPos).x && (pos.x + dx) > scale.get(nextPos).x){
+            dx =  scale.get(nextPos).x - pos.x;
         }
-        else if(pos.y == scale.get(nextPos).y){
-            setterPosx(pos.x + moveSpeed * (( scale.get(nextPos).x - pos.x ) / abs(( scale.get(nextPos).x - pos.x ))));
+        if(pos.x > scale.get(nextPos).x && (pos.x + dx) < scale.get(nextPos).x){
+            dx =  scale.get(nextPos).x - pos.x;
         }
+        if(pos.y < scale.get(nextPos).y && (pos.y + dy) > scale.get(nextPos).y){
+            dy =  scale.get(nextPos).y - pos.y;
+        }
+        if(pos.y > scale.get(nextPos).y && (pos.y + dy) < scale.get(nextPos).y){
+            dy =  scale.get(nextPos).y - pos.y;
+        }
+        setterPosx(pos.x+dx); setterPosy(pos.y+dy);
         this.rect = enemyImage.getBoundingBoxAt(pos);
     }
     public void setterPosx (double x){

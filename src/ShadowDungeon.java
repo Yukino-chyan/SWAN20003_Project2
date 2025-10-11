@@ -52,7 +52,9 @@ public class ShadowDungeon extends AbstractGame {
         KeyBulletKin enemy = IOUtils.parseKeyBulletKin(GAME_PROPS.getProperty("keyBulletKin.A"), GAME_PROPS, MESSAGE_PROPS);
         List<Wall> tmpWalls = IOUtils.parseWalls(GAME_PROPS.getProperty("wall.A"));
         List<River> tmpRivers = IOUtils.parseRivers(GAME_PROPS.getProperty("river.A"));
-        roomA = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers);
+        List<BulletKin> tmpBulletKin = IOUtils.parseBulletKin(GAME_PROPS.getProperty("bulletKin.A"), GAME_PROPS, MESSAGE_PROPS);
+        List<AshenBulletKin> tmpAshenBulletKin = IOUtils.parseAshenBulletKin(GAME_PROPS.getProperty("ashenBulletKin.A"), GAME_PROPS, MESSAGE_PROPS);
+        roomA = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers,tmpBulletKin,tmpAshenBulletKin);
         //Create the roomB object
         tmpPri = IOUtils.parseDoors(GAME_PROPS.getProperty("primarydoor.B"));
         tmpSec = IOUtils.parseDoors(GAME_PROPS.getProperty("secondarydoor.B"));
@@ -60,7 +62,9 @@ public class ShadowDungeon extends AbstractGame {
         enemy = IOUtils.parseKeyBulletKin(GAME_PROPS.getProperty("keyBulletKin.B"), GAME_PROPS, MESSAGE_PROPS);
         tmpWalls = IOUtils.parseWalls(GAME_PROPS.getProperty("wall.B"));
         tmpRivers = IOUtils.parseRivers(GAME_PROPS.getProperty("river.B"));
-        roomB = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers);
+        tmpBulletKin = IOUtils.parseBulletKin(GAME_PROPS.getProperty("bulletKin.B"), GAME_PROPS, MESSAGE_PROPS);
+        tmpAshenBulletKin = IOUtils.parseAshenBulletKin(GAME_PROPS.getProperty("ashenBulletKin.B"), GAME_PROPS, MESSAGE_PROPS);
+        roomB = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers,tmpBulletKin,tmpAshenBulletKin);
         //Create the map between rooms and RoomType
         rooms.put(RoomType.PREP,prepRoom);
         rooms.put(RoomType.END,endRoom);

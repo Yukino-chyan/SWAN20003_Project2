@@ -15,16 +15,24 @@ public class BattleRoom implements Room {
     private Boolean gateDelay = false;
     private Doors priDoor,secDoor;
     private List<TreasureBox> treasureBoxes;
-    private KeyBulletKin enemy;
+    private KeyBulletKin keyBulletKin;
     private final List<Wall> walls = new ArrayList<>();
     private final List<River> rivers = new ArrayList<>();
-    BattleRoom(Doors priDoor,Doors secDoor,List<TreasureBox> treasureBoxes,KeyBulletKin enemy,List<Wall> walls,List<River> rivers) {
+    private List<BulletKin> bulletKins;
+    private List<AshenBulletKin> ashenBulletKins;
+    BattleRoom(
+            Doors priDoor,Doors secDoor,
+            List<TreasureBox> treasureBoxes,KeyBulletKin keyBulletKin,
+            List<Wall> walls,List<River> rivers,
+            List<BulletKin> bulletKins,List<AshenBulletKin> ashenBulletKins) {
         this.priDoor = priDoor;
         this.secDoor = secDoor;
         this.treasureBoxes = treasureBoxes;
-        this.enemy = enemy;
+        this.keyBulletKin = keyBulletKin;
         this.walls.addAll(walls);
         this.rivers.addAll(rivers);
+        this.bulletKins = bulletKins;
+        this.ashenBulletKins = ashenBulletKins;
     }
     public Doors getPriDoors() { return priDoor; }
     public Doors getSecDoors() { return secDoor; }
@@ -35,17 +43,19 @@ public class BattleRoom implements Room {
         bg.draw(width/2.0,height/2.0);
         priDoor.show();
         secDoor.show();
-        if(gateDelay && enemy.isAlive()) enemy.show();
         for(TreasureBox t:treasureBoxes) if(!t.getOpen()) t.show();
         for(Wall w:walls) { w.show(); }
         for(River r : rivers) { r.show(); }
+        for(BulletKin bk : bulletKins) { bk.show(); }
+        for(AshenBulletKin k : ashenBulletKins) k.show();
+        if(gateDelay && keyBulletKin.isAlive()) keyBulletKin.show();
     }
     public int clashTest(Player player) {
         if(!priDoor.clash(player) && !secDoor.clash(player)) gateDelay = true;
         if(priDoor.clash(player) && priDoor.getOpen() && gateDelay ) return 1;
         if(secDoor.clash(player) && secDoor.getOpen() && gateDelay) return 3;
-        if(enemy.clash(player) && enemy.isAlive()) {
-            enemy.dead(); priDoor.setterOpen(); secDoor.setterOpen();
+        if(keyBulletKin.clash(player) && keyBulletKin.isAlive()) {
+            keyBulletKin.dead(); priDoor.setterOpen(); secDoor.setterOpen();
             player.setWin(player.getWin()+1);
         }
         for(River r : rivers) { if(r.clash(player)) return 4; }
@@ -69,11 +79,11 @@ public class BattleRoom implements Room {
     public void reset(){
         priDoor.reset();
         secDoor.reset();
-        enemy.reset();
+        keyBulletKin.reset();
         for(TreasureBox t:treasureBoxes) { t.reset(); }
         gateDelay = false;
     }
     public void move(){
-        enemy.move();
+        keyBulletKin.move();
     }
 }

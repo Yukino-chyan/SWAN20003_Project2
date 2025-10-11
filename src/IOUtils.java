@@ -31,6 +31,34 @@ public class IOUtils {
         String[] coordinates = coords.split(",");
         return new Point(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
     }
+    public static List<BulletKin> parseBulletKin(String coords,Properties GAME_PROPS, Properties MESSAGE_PROPS) {
+        java.util.List<BulletKin> bulletKins = new java.util.ArrayList<>();
+        for (String seg : coords.split(";")) {
+            String[] xy = seg.trim().split("\\s*,\\s*");
+            if (xy.length < 2) {
+                throw new IllegalArgumentException("Bad wall coord: " + seg);
+            }
+            double x = Double.parseDouble(xy[0]);
+            double y = Double.parseDouble(xy[1]);
+            Point center = new Point(x, y);
+            bulletKins.add(new BulletKin(center, GAME_PROPS, MESSAGE_PROPS));
+        }
+        return bulletKins;
+    }
+    public static List<AshenBulletKin> parseAshenBulletKin(String coords,Properties GAME_PROPS, Properties MESSAGE_PROPS) {
+        java.util.List<AshenBulletKin> ashenBulletKins = new java.util.ArrayList<>();
+        for (String seg : coords.split(";")) {
+            String[] xy = seg.trim().split("\\s*,\\s*");
+            if (xy.length < 2) {
+                throw new IllegalArgumentException("Bad wall coord: " + seg);
+            }
+            double x = Double.parseDouble(xy[0]);
+            double y = Double.parseDouble(xy[1]);
+            Point center = new Point(x, y);
+            ashenBulletKins.add(new AshenBulletKin(center, GAME_PROPS, MESSAGE_PROPS));
+        }
+        return ashenBulletKins;
+    }
     public static KeyBulletKin parseKeyBulletKin(String coords, Properties GAME_PROPS, Properties MESSAGE_PROPS) {
         java.util.List<Point> scale = new java.util.ArrayList<>();
         for (String seg : coords.split(";")) {
