@@ -31,9 +31,19 @@ public class IOUtils {
         String[] coordinates = coords.split(",");
         return new Point(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
     }
-    public static KeyBulletKin parseKeyBulletKin(String coords) {
-        String[] coordinates = coords.split(",");
-        return new KeyBulletKin(new Point(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1])));
+    public static KeyBulletKin parseKeyBulletKin(String coords, Properties GAME_PROPS, Properties MESSAGE_PROPS) {
+        java.util.List<Point> scale = new java.util.ArrayList<>();
+        for (String seg : coords.split(";")) {
+            String[] xy = seg.trim().split("\\s*,\\s*");
+            if (xy.length < 2) {
+                throw new IllegalArgumentException("Bad wall coord: " + seg);
+            }
+            double x = Double.parseDouble(xy[0]);
+            double y = Double.parseDouble(xy[1]);
+            Point center = new Point(x, y);
+            scale.add(center);
+        }
+        return new KeyBulletKin(scale, GAME_PROPS, MESSAGE_PROPS);
     }
     public static List<TreasureBox> parseTreasureBox(String coords) {
         if (coords.isEmpty() || coords.equals("0")) return java.util.List.of();
@@ -67,7 +77,7 @@ public class IOUtils {
             double x = Double.parseDouble(xy[0]);
             double y = Double.parseDouble(xy[1]);
             Point center = new Point(x, y);
-            walls.add(new Wall(center));  // 如果你的 Wall 需要 Image，请改成传入共享的贴图
+            walls.add(new Wall(center));
         }
         return walls;
     }

@@ -49,7 +49,7 @@ public class ShadowDungeon extends AbstractGame {
         Doors tmpPri = IOUtils.parseDoors(GAME_PROPS.getProperty("primarydoor.A"));
         Doors tmpSec = IOUtils.parseDoors(GAME_PROPS.getProperty("secondarydoor.A"));
         List<TreasureBox> tmpTreasure = IOUtils.parseTreasureBox(GAME_PROPS.getProperty("treasurebox.A"));
-        KeyBulletKin enemy = IOUtils.parseKeyBulletKin(GAME_PROPS.getProperty("keyBulletKin.A"));
+        KeyBulletKin enemy = IOUtils.parseKeyBulletKin(GAME_PROPS.getProperty("keyBulletKin.A"), GAME_PROPS, MESSAGE_PROPS);
         List<Wall> tmpWalls = IOUtils.parseWalls(GAME_PROPS.getProperty("wall.A"));
         List<River> tmpRivers = IOUtils.parseRivers(GAME_PROPS.getProperty("river.A"));
         roomA = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers);
@@ -57,7 +57,7 @@ public class ShadowDungeon extends AbstractGame {
         tmpPri = IOUtils.parseDoors(GAME_PROPS.getProperty("primarydoor.B"));
         tmpSec = IOUtils.parseDoors(GAME_PROPS.getProperty("secondarydoor.B"));
         tmpTreasure = IOUtils.parseTreasureBox(GAME_PROPS.getProperty("treasurebox.B"));
-        enemy = IOUtils.parseKeyBulletKin(GAME_PROPS.getProperty("keyBulletKin.B"));
+        enemy = IOUtils.parseKeyBulletKin(GAME_PROPS.getProperty("keyBulletKin.B"), GAME_PROPS, MESSAGE_PROPS);
         tmpWalls = IOUtils.parseWalls(GAME_PROPS.getProperty("wall.B"));
         tmpRivers = IOUtils.parseRivers(GAME_PROPS.getProperty("river.B"));
         roomB = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers);
@@ -84,6 +84,8 @@ public class ShadowDungeon extends AbstractGame {
         if(input.isDown(Keys.R)){
             prepRoom.getSecDoors().setterOpen();
         }
+        if(currentRoom == roomA) roomA.move();
+        if(currentRoom == roomB) roomB.move();
         player.setterBounds(player.getPlayerPos(input));
         player.move(input,solid);
         int val = currentRoom.clashTest(player);

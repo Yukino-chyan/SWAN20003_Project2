@@ -73,4 +73,7 @@ public class BattleRoom implements Room {
         for(TreasureBox t:treasureBoxes) { t.reset(); }
         gateDelay = false;
     }
+    public void move(){
+        enemy.move();
+    }
 }
