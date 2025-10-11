@@ -22,6 +22,7 @@ public class Player {
     private int shotSpeed;
     private int killCoin;
     private double hurtPerShoot;
+    private double initialX,initialY;
     Messege messegeCoin,messegeHealth,messegeKey,messegeWeaponLevel;
     Point playerPos;
     public Player (
@@ -46,8 +47,20 @@ public class Player {
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
                 IOUtils.parseCoords(GAME_PROPS.getProperty("healthStat")), health, false
         );
+        messegeKey = new Messege(
+                MESSAGE_PROPS.getProperty("keyDisplay"),
+                new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
+                IOUtils.parseCoords(GAME_PROPS.getProperty("keyStat")), key, false
+        );
+        messegeWeaponLevel = new Messege(
+                MESSAGE_PROPS.getProperty("weaponDisplay"),
+                new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
+                IOUtils.parseCoords(GAME_PROPS.getProperty("weaponStat")), key, false
+        );
         this.hurtPerFrame = hurtPerFrame;
         this.killCoin = killCoin;
+        this.initialX = playerPos.x;
+        this.initialY = playerPos.y;
     }
     public void show(Input input){
         if(input.getMouseX()>playerPos.x){
@@ -58,6 +71,8 @@ public class Player {
         }
         messegeCoin.show();
         messegeHealth.show();
+        messegeKey.show();
+        messegeWeaponLevel.show();
     }
     //The move logic: when player move, use this method
     public void move(Input input, List<Wall> walls){
@@ -160,6 +175,10 @@ public class Player {
         messegeCoin.setNum(coin);
         messegeHealth.setNum(health);
         win = 0;
+        setterPosx(initialX);
+        setterPosy(initialY);
+        playerLeft = new Image("res/player_left.png");
+        playerRight = new Image("res/player_right.png");
     }
     public void setMarine(){
         playerLeft = new Image("res/marine_left.png");
@@ -167,7 +186,7 @@ public class Player {
         hurtPerFrame = 0;
         killCoin = 0;
     }
-    public void setRobot(){
+    public void setRobot() {
         playerLeft = new Image("res/robot_left.png");
         playerRight = new Image("res/robot_right.png");
         hurtPerFrame = Double.parseDouble(GAME_PROPS.getProperty("riverDamagePerFrame"));

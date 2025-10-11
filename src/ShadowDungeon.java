@@ -43,7 +43,11 @@ public class ShadowDungeon extends AbstractGame {
         //Create the prepRoom object
         Doors tmp = IOUtils.parseDoors(GAME_PROPS.getProperty("door.prep"));
         Point restartPos = IOUtils.parseCoords(GAME_PROPS.getProperty("restartarea.prep"));
-        prepRoom = new PrepRoom(tmp,restartPos,GAME_PROPS,MESSAGE_PROPS);
+        Point marineMessagePos = IOUtils.parseCoords(GAME_PROPS.getProperty("marineMessage"));
+        Point robotMesssagePos = IOUtils.parseCoords(GAME_PROPS.getProperty("robotMessage"));
+        Point marinePos = IOUtils.parseCoords(GAME_PROPS.getProperty("Marine"));
+        Point robotPos = IOUtils.parseCoords(GAME_PROPS.getProperty("Robot"));
+        prepRoom = new PrepRoom(tmp,restartPos,GAME_PROPS,MESSAGE_PROPS,marineMessagePos,robotMesssagePos,marinePos,robotPos);
         //Create the endRoom object
         tmp = IOUtils.parseDoors(GAME_PROPS.getProperty("door.end"));
         endRoom =  new EndRoom(tmp,restartPos,GAME_PROPS,MESSAGE_PROPS);
