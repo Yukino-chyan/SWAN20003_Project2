@@ -19,7 +19,8 @@ public class Player {
     private int win = 0;
     private int key = 0;
     private int weaponLevel = 0;
-    private int shotSpeed;
+    private int bulletFreq,coolDown;
+    public double bulletSpeed;
     private int killCoin;
     private double hurtPerShoot;
     private double initialX,initialY;
@@ -55,12 +56,16 @@ public class Player {
         messegeWeaponLevel = new Messege(
                 MESSAGE_PROPS.getProperty("weaponDisplay"),
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                IOUtils.parseCoords(GAME_PROPS.getProperty("weaponStat")), key, false
+                IOUtils.parseCoords(GAME_PROPS.getProperty("weaponStat")), weaponLevel, false
         );
         this.hurtPerFrame = hurtPerFrame;
         this.killCoin = killCoin;
         this.initialX = playerPos.x;
         this.initialY = playerPos.y;
+        this.bulletFreq = Integer.parseInt(GAME_PROPS.getProperty("bulletFreq"));
+        this.coolDown = bulletFreq;
+        this.bulletSpeed = Double.parseDouble(GAME_PROPS.getProperty("bulletSpeed"));
+        this.hurtPerShoot = Double.parseDouble(GAME_PROPS.getProperty("weaponStandardDamage"));
     }
     public void show(Input input){
         if(input.getMouseX()>playerPos.x){
@@ -149,9 +154,7 @@ public class Player {
     public int getWin(){
         return win;
     }
-    public void setWin(int win){
-        this.win = win;
-    }
+    public void setWin(int win){ this.win = win; }
     public Rectangle getPlayerPos(Input input){
         if(input.getMouseX()>playerPos.x){
             return playerLeft.getBoundingBoxAt(playerPos);
@@ -160,6 +163,10 @@ public class Player {
     }
     public void injured(){
         health -= hurtPerFrame;
+        messegeHealth.setNum(health);
+    }
+    public void injured(double num){
+        health -= num;
         messegeHealth.setNum(health);
     }
     public void getTreasure(TreasureBox tmp){
@@ -180,7 +187,7 @@ public class Player {
         health = 100.0;
         messegeCoin.setNum(coin);
         messegeHealth.setNum(health);
-        win = 0;
+        win = 0; key = 0; messegeKey.setNum(key);
         setterPosx(initialX);
         setterPosy(initialY);
         playerLeft = new Image("res/player_left.png");
@@ -197,5 +204,22 @@ public class Player {
         playerRight = new Image("res/robot_right.png");
         hurtPerFrame = Double.parseDouble(GAME_PROPS.getProperty("riverDamagePerFrame"));
         killCoin = Integer.parseInt(GAME_PROPS.getProperty("robotExtraCoin"));
+    }
+    public int getKey(){ return key; }
+    public void gainKey(){ key++; messegeKey.setNum(key); }
+    public void setKey(int key){ this.key = key; messegeKey.setNum(key); }
+    public void shotBattle(BattleRoom battleRoom, Input input){
+        if(coolDown != 0) return ;
+        else coolDown = bulletFreq;
+        battleRoom.shotBullet(this,input);
+    }
+    public void shotCoolDown(){
+        if(coolDown != 0) coolDown -- ;
+    }
+    public Double getHurtPerShot(){
+        return hurtPerShoot;
+    }
+    public Double getBulletSpeed(){
+        return bulletSpeed;
     }
 }

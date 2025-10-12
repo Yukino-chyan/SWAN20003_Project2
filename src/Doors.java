@@ -38,4 +38,6 @@ public class Doors {
     public void reset(){
         open = false;
     }
+    public Boolean clashBullet(Bullet bullet) { return rect.intersects(bullet.getterBounds()) & (!open); }
+    public Boolean clashFireball(Fireball fireball) { return rect.intersects(fireball.getterBounds()) & (!open); }
 }

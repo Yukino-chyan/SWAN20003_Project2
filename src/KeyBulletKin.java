@@ -49,4 +49,5 @@ public class KeyBulletKin extends Enemy {
     public void setterPosy (double y){
         pos = new Point(pos.x,y);
     }
+    public void reset() { isalive = true; health = originHealth; nextPos = 1;}
 }

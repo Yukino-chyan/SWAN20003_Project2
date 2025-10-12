@@ -16,4 +16,6 @@ public class Wall {
     public Boolean clash(Player player){
         return rect.intersects(player.getterBounds());
     }
+    public Boolean clashFireball(Fireball fb){ return rect.intersects(fb.getterBounds()); }
+    public Boolean clashBullet(Bullet b){ return rect.intersects(b.getterBounds()); }
 }

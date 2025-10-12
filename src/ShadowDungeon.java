@@ -96,10 +96,19 @@ public class ShadowDungeon extends AbstractGame {
             if(input.isDown(Keys.R)){ player.setRobot(); }
             else if(input.isDown(Keys.M)){ player.setMarine(); }
         }
+        player.shotCoolDown();
+        if(input.isDown(MouseButtons.LEFT)){
+            if(currentRoom == roomA) player.shotBattle(roomA,input);
+            if(currentRoom == roomB) player.shotBattle(roomB,input);
+        }
         if(currentRoom == roomA) roomA.shot(player);
         if(currentRoom == roomB) roomB.shot(player);
         if(currentRoom == roomA) roomA.move();
         if(currentRoom == roomB) roomB.move();
+        if(currentRoom == roomA) roomA.fireballClashTest(player);
+        if(currentRoom == roomB) roomB.fireballClashTest(player);
+        if(currentRoom == roomA && roomA.getPassed() == false) roomA.winTest(player);
+        if(currentRoom == roomB && roomB.getPassed() == false) roomB.winTest(player);
         player.setterBounds(player.getPlayerPos(input));
         player.move(input,solid);
         int val = currentRoom.clashTest(player);
@@ -131,7 +140,7 @@ public class ShadowDungeon extends AbstractGame {
         //Deal with the clash with river
         else if(val == 4){ player.injured(); }
         //Deal with the clash with treasurebox
-        else if(val == 5){
+        else if(val == 5 && player.getKey() > 0){
             List<TreasureBox> treasureBoxes = new ArrayList<>();
             if(currentRoom == roomA) treasureBoxes = roomA.getTreasureBoxes();
             if(currentRoom == roomB) treasureBoxes = roomB.getTreasureBoxes();
@@ -139,6 +148,7 @@ public class ShadowDungeon extends AbstractGame {
                 if(tmp.clash(player) && input.isDown(Keys.K) && !tmp.getOpen()){
                     player.getTreasure(tmp);
                     tmp.setOpen(true);
+                    player.setKey(player.getKey() - 1);
                 }
             }
         }

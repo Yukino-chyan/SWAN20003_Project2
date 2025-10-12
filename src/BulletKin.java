@@ -41,4 +41,8 @@ public class BulletKin extends Enemy {
         speedY = fireballSpeed * disY / sqrt(disX * disX + disY * disY);
         return new Fireball(pos,speedX,speedY,fireballDamage);
     }
+    public void injured(double num){
+        health -=  num;
+        if(health <= 0){ dead(); }
+    }
 }
