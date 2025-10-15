@@ -169,6 +169,10 @@ public class Player {
         health -= num;
         messegeHealth.setNum(health);
     }
+    public void getKill(int num){
+        coin = coin + num + killCoin;
+        messegeCoin.setNum(coin);
+    }
     public void getTreasure(TreasureBox tmp){
         coin += tmp.getNum();
         messegeCoin.setNum(coin);
@@ -216,10 +220,20 @@ public class Player {
     public void shotCoolDown(){
         if(coolDown != 0) coolDown -- ;
     }
-    public Double getHurtPerShot(){
+    public double getHurtPerShot(){
         return hurtPerShoot;
     }
-    public Double getBulletSpeed(){
+    public double getBulletSpeed(){
         return bulletSpeed;
     }
+    public double getHurtPerFrame(){ return hurtPerFrame; }
+    public int getCoin() { return coin; }
+    public void useCoin(int coin){ this.coin -= coin; messegeCoin.setNum(this.coin); }
+    public void gainHealth(double health){ this.health += health; messegeHealth.setNum(this.health); }
+    public int getWeaponLevel(){ return weaponLevel; }
+    public void setHurtPerShoot(double hurtPerShoot){
+        weaponLevel ++; this.hurtPerShoot = hurtPerShoot;
+        messegeWeaponLevel.setNum(weaponLevel);
+    }
+
 }

@@ -23,6 +23,8 @@ public class ShadowDungeon extends AbstractGame {
     private BattleRoom roomA,roomB;
     private EndRoom endRoom;
     private Player player;
+    private Store store;
+    private boolean pause;
     private final Map<RoomType, Room> rooms = new EnumMap<>(RoomType.class);
     public ShadowDungeon(Properties gameProps, Properties messageProps) {
         super(Integer.parseInt(gameProps.getProperty("window.width")),
@@ -77,6 +79,7 @@ public class ShadowDungeon extends AbstractGame {
         rooms.put(RoomType.A,roomA);
         rooms.put(RoomType.B,roomB);
         currentRoom = prepRoom;
+        this.store = new Store(GAME_PROPS);
     }
     /**
      * Render the relevant screen based on the keyboard input given by the user and the status of the gameplay.
@@ -87,84 +90,107 @@ public class ShadowDungeon extends AbstractGame {
         if (input.wasPressed(Keys.ESCAPE)) {
             Window.close();
         }
-        //Get the wall of the currentroom, it is used to make sure the player will not walk into the wall
-        List<Wall> solid = new ArrayList<>();
-        if(currentRoom == roomA) solid = roomA.getWalls();
-        if(currentRoom == roomB) solid = roomB.getWalls();
-        if(input.isDown(Keys.R) || input.isDown(Keys.M)){
-            prepRoom.getSecDoors().setterOpen();
-            if(input.isDown(Keys.R)){ player.setRobot(); }
-            else if(input.isDown(Keys.M)){ player.setMarine(); }
-        }
-        player.shotCoolDown();
-        if(input.isDown(MouseButtons.LEFT)){
-            if(currentRoom == roomA) player.shotBattle(roomA,input);
-            if(currentRoom == roomB) player.shotBattle(roomB,input);
-        }
-        if(currentRoom == roomA) roomA.shot(player);
-        if(currentRoom == roomB) roomB.shot(player);
-        if(currentRoom == roomA) roomA.move();
-        if(currentRoom == roomB) roomB.move();
-        if(currentRoom == roomA) roomA.fireballClashTest(player);
-        if(currentRoom == roomB) roomB.fireballClashTest(player);
-        if(currentRoom == roomA && roomA.getPassed() == false) roomA.winTest(player);
-        if(currentRoom == roomB && roomB.getPassed() == false) roomB.winTest(player);
-        player.setterBounds(player.getPlayerPos(input));
-        player.move(input,solid);
-        int val = currentRoom.clashTest(player);
-        //Deal with the clash with pridoor.
-        if(val == 1){
-            Doors clashDoor = currentRoom.getPriDoors();
-            RoomType to = clashDoor.getToRoom();
-            Room toRoom = rooms.get(to);
-            currentRoom = toRoom;
-            currentRoom.entry(player,true);
-        }
-        //Deal with the clash with enemy
-        else if(val == 2 && input.isDown(Keys.ENTER)){
-            player.reset();
-            prepRoom.reset();
-            roomA.reset();
-            roomB.reset();
-            endRoom.reset();
-            currentRoom = prepRoom;
-        }
-        //Deal with the clash with secdoor
-        else if(val == 3){
-            Doors clashDoor = currentRoom.getSecDoors();
-            RoomType to = clashDoor.getToRoom();
-            Room toRoom = rooms.get(to);
-            currentRoom = toRoom;
-            currentRoom.entry(player,false);
-        }
-        //Deal with the clash with river
-        else if(val == 4){ player.injured(); }
-        //Deal with the clash with treasurebox
-        else if(val == 5 && player.getKey() > 0){
-            List<TreasureBox> treasureBoxes = new ArrayList<>();
-            if(currentRoom == roomA) treasureBoxes = roomA.getTreasureBoxes();
-            if(currentRoom == roomB) treasureBoxes = roomB.getTreasureBoxes();
-            for(TreasureBox tmp : treasureBoxes) {
-                if(tmp.clash(player) && input.isDown(Keys.K) && !tmp.getOpen()){
-                    player.getTreasure(tmp);
-                    tmp.setOpen(true);
-                    player.setKey(player.getKey() - 1);
-                }
+        if(pause){
+            currentRoom.show(input);
+            player.show(input);
+            store.show();
+            if(input.wasPressed(Keys.L)){ store.buyForWeapon(player); }
+            else if(input.wasPressed(Keys.E)){ store.buyForHealth(player); }
+            else if(input.isDown(Keys.P)){
+                pause = false;
+                player.reset();
+                prepRoom.reset();
+                roomA.reset();
+                roomB.reset();
+                endRoom.reset();
+                currentRoom = prepRoom;
             }
         }
-        //If the player's health lower than zero, he loses.
-        if(player.getHealth() <= 0){
-            endRoom.setWinFlag(false);
-            currentRoom = endRoom;
+        else{
+            //Get the wall of the currentroom, it is used to make sure the player will not walk into the wall
+            List<Wall> solid = new ArrayList<>();
+            if(currentRoom == roomA) solid = roomA.getWalls();
+            if(currentRoom == roomB) solid = roomB.getWalls();
+            if(input.isDown(Keys.R) || input.isDown(Keys.M)){
+                prepRoom.getSecDoors().setterOpen();
+                if(input.isDown(Keys.R)){ player.setRobot(); }
+                else if(input.isDown(Keys.M)){ player.setMarine(); }
+            }
+            player.shotCoolDown();
+            if(input.isDown(MouseButtons.LEFT)){
+                if(currentRoom == roomA) player.shotBattle(roomA,input);
+                if(currentRoom == roomB) player.shotBattle(roomB,input);
+            }
+            if(currentRoom == roomA) roomA.shot(player);
+            if(currentRoom == roomB) roomB.shot(player);
+            if(currentRoom == roomA) roomA.move();
+            if(currentRoom == roomB) roomB.move();
+            if(currentRoom == roomA) roomA.fireballClashTest(player);
+            if(currentRoom == roomB) roomB.fireballClashTest(player);
+            if(currentRoom == roomA && roomA.getPassed() == false) roomA.winTest(player);
+            if(currentRoom == roomB && roomB.getPassed() == false) roomB.winTest(player);
+            player.setterBounds(player.getPlayerPos(input));
+            player.move(input,solid);
+            int val = currentRoom.clashTest(player);
+            //Deal with the clash with pridoor.
+            if(val == 1){
+                Doors clashDoor = currentRoom.getPriDoors();
+                RoomType to = clashDoor.getToRoom();
+                Room toRoom = rooms.get(to);
+                currentRoom = toRoom;
+                currentRoom.entry(player,true);
+            }
+            //Deal with the clash with enemy
+            else if(val == 2 && input.isDown(Keys.ENTER)){
+                player.reset();
+                prepRoom.reset();
+                roomA.reset();
+                roomB.reset();
+                endRoom.reset();
+                currentRoom = prepRoom;
+            }
+            //Deal with the clash with secdoor
+            else if(val == 3){
+                Doors clashDoor = currentRoom.getSecDoors();
+                RoomType to = clashDoor.getToRoom();
+                Room toRoom = rooms.get(to);
+                currentRoom = toRoom;
+                currentRoom.entry(player,false);
+            }
+            //Deal with the clash with river
+            else if(val == 4){ player.injured(); }
+            //Deal with the clash with treasurebox
+            else if(val == 5 && player.getKey() > 0){
+                List<TreasureBox> treasureBoxes = new ArrayList<>();
+                if(currentRoom == roomA) treasureBoxes = roomA.getTreasureBoxes();
+                if(currentRoom == roomB) treasureBoxes = roomB.getTreasureBoxes();
+                for(TreasureBox tmp : treasureBoxes) {
+                    if(tmp.clash(player) && input.isDown(Keys.K) && !tmp.getOpen()){
+                        player.getTreasure(tmp);
+                        tmp.setOpen(true);
+                        player.setKey(player.getKey() - 1);
+                    }
+                }
+            }
+            else if(val == 6){
+                player.injured(player.getHurtPerFrame());
+            }
+            //If the player's health lower than zero, he loses.
+            if(player.getHealth() <= 0){
+                endRoom.setWinFlag(false);
+                currentRoom = endRoom;
+            }
+            //If the player has killed two enemy, he wins.
+            if(player.getWin() == 2) {
+                endRoom.setWinFlag(true);
+                player.setWin(0);
+            }
+            //Show the scene
+            currentRoom.show(input);
+            player.show(input);
         }
-        //If the player has killed two enemy, he wins.
-        if(player.getWin() == 2) {
-            endRoom.setWinFlag(true);
-            player.setWin(0);
-        }
-        //Show the scene
-        currentRoom.show(input);
-        player.show(input);
+        if(input.wasPressed(Keys.SPACE) && pause == false){ pause = true; }
+        else if(input.wasPressed(Keys.SPACE) && pause == true){ pause = false; }
     }
     /**
      * The main entry point of the Shadow Dungeon game.

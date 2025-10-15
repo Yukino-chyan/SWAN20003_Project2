@@ -19,6 +19,7 @@ public class KeyBulletKin extends Enemy {
         this.contactHurt = 0.2;
         this.pos = scale.get(0);
         this.rect = enemyImage.getBoundingBoxAt(pos);
+        this.originHealth = this.health;
     }
     public void move(){
         if(pos.equals(scale.get(nextPos))){ nextPos++; }

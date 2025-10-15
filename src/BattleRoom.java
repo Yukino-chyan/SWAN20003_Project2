@@ -64,6 +64,9 @@ public class BattleRoom implements Room {
         if(secDoor.clash(player) && secDoor.getOpen() && gateDelay) return 3;
         for(River r : rivers) { if(r.clash(player)) return 4; }
         for(TreasureBox t:treasureBoxes) { if(t.clash(player)) return 5; }
+        for(AshenBulletKin a:ashenBulletKins) { if(a.clash(player) && a.isAlive() ) return 6; }
+        for(BulletKin b:bulletKins) { if(b.clash(player) && b.isAlive() ) return 6; }
+        if(keyBulletKin.clash(player) && keyBulletKin.isAlive()) return 6;
         return 0;
     }
     public List<TreasureBox> getTreasureBoxes() {
@@ -170,7 +173,7 @@ public class BattleRoom implements Room {
             for(int j = 0 ; j < bulletKins.size(); j++) {
                 if(!bulletKins.get(j).isalive) continue;
                 if(bulletKins.get(j).clashBullet(bullets.get(i))){
-                    bulletKins.get(j).injured(bullets.get(i).getDamage());
+                    bulletKins.get(j).injured(bullets.get(i).getDamage(),player);
                     bullets.remove(bullets.get(i));
                     i--; flag = 1;
                     break;
@@ -180,7 +183,7 @@ public class BattleRoom implements Room {
             for(int j = 0 ; j < ashenBulletKins.size(); j++) {
                 if(!ashenBulletKins.get(j).isalive) continue;
                 if(ashenBulletKins.get(j).clashBullet(bullets.get(i))){
-                    ashenBulletKins.get(j).injured(bullets.get(i).getDamage());
+                    ashenBulletKins.get(j).injured(bullets.get(i).getDamage(),player);
                     bullets.remove(bullets.get(i));
                     i--; flag = 1;
                     break;

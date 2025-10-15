@@ -23,6 +23,7 @@ public class BulletKin extends Enemy {
         this.contactHurt = 0.2;
         this.rect = enemyImage.getBoundingBoxAt(pos);
         this.coolDown = this.shotSpeed;
+        this.originHealth = this.health;
     }
     public void setterPosx (double x){
         pos = new Point(x,pos.y);
@@ -41,8 +42,8 @@ public class BulletKin extends Enemy {
         speedY = fireballSpeed * disY / sqrt(disX * disX + disY * disY);
         return new Fireball(pos,speedX,speedY,fireballDamage);
     }
-    public void injured(double num){
+    public void injured(double num,Player player){
         health -=  num;
-        if(health <= 0){ dead(); }
+        if(health <= 0){ dead(); player.getKill(killCoin); }
     }
 }
