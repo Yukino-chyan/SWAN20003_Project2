@@ -2,38 +2,13 @@ import bagel.Image;
 import bagel.util.Point;
 import bagel.util.Rectangle;
 
-public class Fireball {
-    private Point pos;
-    private Image fireballImage = new Image("res/fireball.png");
-    private double speedX,speedY,damage;
-    private Rectangle rect;
+public class Fireball extends Projectile {
     public Fireball(Point pos, Double speedX, Double speedY, Double damage) {
         this.pos = pos;
         this.speedX = speedX;
         this.speedY = speedY;
         this.damage = damage;
-        this.rect = fireballImage.getBoundingBoxAt(pos);
+        this.projectileImage = new Image("res/fireball.png");
+        this.rect = projectileImage.getBoundingBoxAt(pos);
     }
-    public void setterPosX(double x){
-        pos = new Point(x,pos.y);
-    }
-    public void setterPosY(double y){
-        pos = new Point(pos.x,y);
-    }
-    public void show(){
-        fireballImage.draw(pos.x, pos.y);
-    }
-    public void move(){
-        setterPosX(pos.x + speedX);
-        setterPosY(pos.y + speedY);
-        setterBounds();
-    }
-    public void setterBounds(){
-        rect = fireballImage.getBoundingBoxAt(pos);
-    }
-    public Rectangle getterBounds() { return rect; }
-    public Boolean clash(Player player){
-        return rect.intersects(player.getterBounds());
-    }
-    public double getDamage(){ return damage; }
 }
