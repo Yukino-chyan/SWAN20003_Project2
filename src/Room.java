@@ -12,4 +12,7 @@ public interface Room {
     Doors getSecDoors();
     int clashTest(Player player);
     void entry(Player player,Boolean backflag);
+    void clean();
+    void shotBullet(Player player, Input input);
+    void move();
 }

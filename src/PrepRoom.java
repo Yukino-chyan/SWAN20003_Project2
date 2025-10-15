@@ -3,9 +3,15 @@ import bagel.Keys;
 import bagel.Image;
 import bagel.Font;
 import bagel.util.Point;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import bagel.Window;
+
+import static java.lang.Math.sqrt;
+
 public class PrepRoom implements Room {
     private Boolean gateDelay = false;
     private final Properties GAME_PROPS;
@@ -15,6 +21,7 @@ public class PrepRoom implements Room {
     private Restart_Area restartArea;
     private Messege title,moveMessege,marineMessege,robotMessege,selectMessege;
     private Image marineImage, robotImage;
+    private List<Bullet> bullets =  new ArrayList<>();
     public PrepRoom
             (Doors doorToA,Point restartPos,
              Properties GAME_PROPS, Properties MESSAGE_PROPS,
@@ -64,6 +71,7 @@ public class PrepRoom implements Room {
         selectMessege.show();
         marineImage.draw(marinePos.x,marinePos.y);
         robotImage.draw(robotPos.x,robotPos.y);
+        for(Bullet bullet : bullets) { bullet.show(); }
     }
     public Doors getPriDoors() { return doorToA; }
     public Doors getSecDoors() { return doorToA; }
@@ -82,4 +90,16 @@ public class PrepRoom implements Room {
         doorToA.reset();
         gateDelay = false;
     }
+    public void shotBullet(Player player,Input input){
+        Point playerPos =  new Point(player.getPosX(),player.getPosY());
+        Point mousePos = input.getMousePosition();
+        double speedX,speedY,disX,disY;
+        disX = mousePos.x - player.getPosX();
+        disY = mousePos.y - player.getPosY();
+        speedX = player.getBulletSpeed() * disX / sqrt(disX * disX + disY * disY);
+        speedY = player.getBulletSpeed() * disY / sqrt(disX * disX + disY * disY);
+        bullets.add(new Bullet(playerPos,speedX,speedY,player.getHurtPerShot()));
+    }
+    public void clean(){ bullets.clear(); }
+    public void move(){ for(Bullet bb:bullets) { bb.move(); } }
 }

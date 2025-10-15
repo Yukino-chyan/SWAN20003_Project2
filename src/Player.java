@@ -24,8 +24,9 @@ public class Player {
     private int killCoin;
     private double hurtPerShoot;
     private double initialX,initialY;
-    Messege messegeCoin,messegeHealth,messegeKey,messegeWeaponLevel;
-    Point playerPos;
+    private Messege messegeCoin,messegeHealth,messegeKey,messegeWeaponLevel;
+    private Point playerPos;
+    private Boolean hasChosen = false;
     public Player (
             Point playerPos,int coin,int health,int speed,
             Properties GAME_PROPS,Properties MESSAGE_PROPS,Image playerLeft,Image playerRight,
@@ -196,14 +197,17 @@ public class Player {
         setterPosy(initialY);
         playerLeft = new Image("res/player_left.png");
         playerRight = new Image("res/player_right.png");
+        hasChosen = false;
     }
     public void setMarine(){
+        hasChosen = true;
         playerLeft = new Image("res/marine_left.png");
         playerRight = new Image("res/marine_right.png");
         hurtPerFrame = 0;
         killCoin = 0;
     }
     public void setRobot() {
+        hasChosen = true;
         playerLeft = new Image("res/robot_left.png");
         playerRight = new Image("res/robot_right.png");
         hurtPerFrame = Double.parseDouble(GAME_PROPS.getProperty("riverDamagePerFrame"));
@@ -212,11 +216,6 @@ public class Player {
     public int getKey(){ return key; }
     public void gainKey(){ key++; messegeKey.setNum(key); }
     public void setKey(int key){ this.key = key; messegeKey.setNum(key); }
-    public void shotBattle(BattleRoom battleRoom, Input input){
-        if(coolDown != 0) return ;
-        else coolDown = bulletFreq;
-        battleRoom.shotBullet(this,input);
-    }
     public void shotCoolDown(){
         if(coolDown != 0) coolDown -- ;
     }
@@ -235,5 +234,10 @@ public class Player {
         weaponLevel ++; this.hurtPerShoot = hurtPerShoot;
         messegeWeaponLevel.setNum(weaponLevel);
     }
-
+    public void shot(Room room, Input input){
+        if(coolDown != 0) return ;
+        else coolDown = bulletFreq;
+        room.shotBullet(this,input);
+    }
+    public Boolean getHasChosen(){ return hasChosen; }
 }

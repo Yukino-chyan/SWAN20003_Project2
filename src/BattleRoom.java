@@ -23,8 +23,8 @@ public class BattleRoom implements Room {
     private final List<River> rivers = new ArrayList<>();
     private List<BulletKin> bulletKins;
     private List<AshenBulletKin> ashenBulletKins;
-    private List<Fireball> fireballs =  new ArrayList<>();
-    private List<Bullet> bullets =  new ArrayList<>();
+    private List<Fireball> fireballs = new ArrayList<>();
+    private List<Bullet> bullets = new ArrayList<>();
     private Boolean passed = false;
     public BattleRoom(
             Doors priDoor,Doors secDoor,
@@ -201,4 +201,5 @@ public class BattleRoom implements Room {
         if(!keyBulletKin.isalive) { numDead++; }
         if(num == numDead) { priDoor.setterOpen(); secDoor.setterOpen(); player.setWin(player.getWin() + 1); passed = true; }
     }
+    public void clean(){ bullets.clear(); }
 }

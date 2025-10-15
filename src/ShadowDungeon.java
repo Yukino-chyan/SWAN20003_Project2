@@ -117,14 +117,10 @@ public class ShadowDungeon extends AbstractGame {
                 else if(input.isDown(Keys.M)){ player.setMarine(); }
             }
             player.shotCoolDown();
-            if(input.isDown(MouseButtons.LEFT)){
-                if(currentRoom == roomA) player.shotBattle(roomA,input);
-                if(currentRoom == roomB) player.shotBattle(roomB,input);
-            }
+            if(input.isDown(MouseButtons.LEFT) && player.getHasChosen() == true) player.shot(currentRoom,input);
+            currentRoom.move();
             if(currentRoom == roomA) roomA.shot(player);
             if(currentRoom == roomB) roomB.shot(player);
-            if(currentRoom == roomA) roomA.move();
-            if(currentRoom == roomB) roomB.move();
             if(currentRoom == roomA) roomA.fireballClashTest(player);
             if(currentRoom == roomB) roomB.fireballClashTest(player);
             if(currentRoom == roomA && roomA.getPassed() == false) roomA.winTest(player);
@@ -137,6 +133,7 @@ public class ShadowDungeon extends AbstractGame {
                 Doors clashDoor = currentRoom.getPriDoors();
                 RoomType to = clashDoor.getToRoom();
                 Room toRoom = rooms.get(to);
+                currentRoom.clean();
                 currentRoom = toRoom;
                 currentRoom.entry(player,true);
             }
@@ -154,6 +151,7 @@ public class ShadowDungeon extends AbstractGame {
                 Doors clashDoor = currentRoom.getSecDoors();
                 RoomType to = clashDoor.getToRoom();
                 Room toRoom = rooms.get(to);
+                currentRoom.clean();
                 currentRoom = toRoom;
                 currentRoom.entry(player,false);
             }
