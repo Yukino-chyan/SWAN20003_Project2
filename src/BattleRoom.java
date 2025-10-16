@@ -26,8 +26,10 @@ public class BattleRoom implements Room {
     private List<Fireball> fireballs = new ArrayList<>();
     private List<Bullet> bullets = new ArrayList<>();
     private Boolean passed = false;
+    private Boolean haveKey = false;
     private Basket basket;
     private Table table;
+    private Key key;
     public BattleRoom(
             Doors priDoor,Doors secDoor,
             List<TreasureBox> treasureBoxes,KeyBulletKin keyBulletKin,
@@ -66,8 +68,14 @@ public class BattleRoom implements Room {
             for(AshenBulletKin k : ashenBulletKins) k.show();
             if(keyBulletKin.isAlive()) keyBulletKin.show();
         }
+        if(haveKey) key.show();
     }
     public int clashTest(Player player) {
+        if(haveKey){
+            if(key.clash(player) && key.isAlive()){
+                player.gainKey(); haveKey = false; key.dead();
+            }
+        }
         if(!priDoor.clash(player) && !secDoor.clash(player)) gateDelay = true;
         if(priDoor.clash(player) && priDoor.getOpen() && gateDelay ) return 1;
         if(secDoor.clash(player) && secDoor.getOpen() && gateDelay) return 3;
@@ -102,7 +110,7 @@ public class BattleRoom implements Room {
         fireballs.clear();
         bullets.clear();
         gateDelay = false;
-        passed = false;
+        passed = false; haveKey = false;
         basket.reset(); table.reset();
     }
     public void shotFireball(Player player){
@@ -171,7 +179,7 @@ public class BattleRoom implements Room {
                 bullets.remove(bullets.get(i)); continue;
             }
             if(keyBulletKin.clashBullet(bullets.get(i)) && keyBulletKin.isAlive()){
-                keyBulletKin.dead(); player.gainKey();
+                keyBulletKin.dead(); key = new Key(keyBulletKin.getPos()); haveKey = true;
                 bullets.remove(bullets.get(i)); continue;
             }
             if(basket.clashBullet(bullets.get(i)) && basket.isAlive()){
@@ -221,7 +229,7 @@ public class BattleRoom implements Room {
         if(!keyBulletKin.isalive) { numDead++; }
         if(num == numDead) { priDoor.setterOpen(); secDoor.setterOpen(); player.setWin(player.getWin() + 1); passed = true; }
     }
-    public void clean(){ bullets.clear(); }
+    public void clean(){ fireballs.clear(); bullets.clear(); }
     public Basket getBasket() { return basket; }
     public Table getTable() { return table; }
     public Boolean getGateDelay(){ return gateDelay; }

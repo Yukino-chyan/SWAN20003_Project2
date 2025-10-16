@@ -51,4 +51,5 @@ public class KeyBulletKin extends Enemy {
         pos = new Point(pos.x,y);
     }
     public void reset() { isalive = true; health = originHealth; nextPos = 1;}
+    public Point getPos() { return this.pos; }
 }
