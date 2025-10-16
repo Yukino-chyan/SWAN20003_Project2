@@ -42,22 +42,22 @@ public class Player {
         messegeCoin = new Messege(
                 MESSAGE_PROPS.getProperty("coinDisplay"),
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                IOUtils.parseCoords(GAME_PROPS.getProperty("coinStat")), coin, false
+                IOUtils.parseCoords(GAME_PROPS.getProperty("coinStat")), coin, false,false
         );
         messegeHealth = new Messege(
                 MESSAGE_PROPS.getProperty("healthDisplay"),
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                IOUtils.parseCoords(GAME_PROPS.getProperty("healthStat")), health, false
+                IOUtils.parseCoords(GAME_PROPS.getProperty("healthStat")), health, false,true
         );
         messegeKey = new Messege(
                 MESSAGE_PROPS.getProperty("keyDisplay"),
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                IOUtils.parseCoords(GAME_PROPS.getProperty("keyStat")), key, false
+                IOUtils.parseCoords(GAME_PROPS.getProperty("keyStat")), key, false,false
         );
         messegeWeaponLevel = new Messege(
                 MESSAGE_PROPS.getProperty("weaponDisplay"),
                 new Font(GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                IOUtils.parseCoords(GAME_PROPS.getProperty("weaponStat")), weaponLevel, false
+                IOUtils.parseCoords(GAME_PROPS.getProperty("weaponStat")), weaponLevel, false,false
         );
         this.hurtPerFrame = hurtPerFrame;
         this.killCoin = killCoin;

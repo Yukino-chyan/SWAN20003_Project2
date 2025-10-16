@@ -29,12 +29,12 @@ public class EndRoom implements Room {
         congratesMessege = new Messege(
                 MESSAGE_PROPS.getProperty("gameEnd.won"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("title.fontSize"))),
-                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true
+                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true,false
         );
         gameoverMessege = new Messege(
                 MESSAGE_PROPS.getProperty("gameEnd.lost"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("title.fontSize"))),
-                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true
+                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true,false
         );
     }
     public void show(Input input) {

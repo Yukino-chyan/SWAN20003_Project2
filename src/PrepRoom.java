@@ -37,27 +37,27 @@ public class PrepRoom implements Room {
         title = new Messege(
                 MESSAGE_PROPS.getProperty("title"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("title.fontSize"))),
-                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true
+                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true,false
         );
         moveMessege = new Messege(
                 MESSAGE_PROPS.getProperty("moveMessage"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("prompt.fontSize"))),
-                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("moveMessage.y"))), -1.0, true
+                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("moveMessage.y"))), -1.0, true,false
         );
         marineMessege = new Messege(
                 MESSAGE_PROPS.getProperty("marineDescription"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                marineMessegePos,-1,false
+                marineMessegePos,-1,false,false
         );
         robotMessege = new Messege(
                 MESSAGE_PROPS.getProperty("robotDescription"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))),
-                robotMessegePos,-1,false
+                robotMessegePos,-1,false,false
         );
         selectMessege = new Messege(
                 MESSAGE_PROPS.getProperty("selectMessage"),
                 new Font (GAME_PROPS.getProperty("font"),Integer.parseInt(GAME_PROPS.getProperty("prompt.fontSize"))),
-                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("selectMessage.y"))),-1,true
+                new Point (Window.getWidth()/2.0,Double.parseDouble(GAME_PROPS.getProperty("selectMessage.y"))),-1,true,false
         );
     }
     public void show(Input input) {
