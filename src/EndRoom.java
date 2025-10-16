@@ -79,4 +79,5 @@ public class EndRoom implements Room {
         bullets.add(new Bullet(playerPos,speedX,speedY,player.getHurtPerShot()));
     }
     public void move(){ for(Bullet bb:bullets) { bb.move(); } }
+    public Boolean getGateDelay(){ return gateDelay; }
 }

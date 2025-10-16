@@ -26,11 +26,14 @@ public class BattleRoom implements Room {
     private List<Fireball> fireballs = new ArrayList<>();
     private List<Bullet> bullets = new ArrayList<>();
     private Boolean passed = false;
+    private Basket basket;
+    private Table table;
     public BattleRoom(
             Doors priDoor,Doors secDoor,
             List<TreasureBox> treasureBoxes,KeyBulletKin keyBulletKin,
             List<Wall> walls,List<River> rivers,
-            List<BulletKin> bulletKins,List<AshenBulletKin> ashenBulletKins) {
+            List<BulletKin> bulletKins,List<AshenBulletKin> ashenBulletKins,
+            Basket basket, Table table) {
         this.priDoor = priDoor;
         this.secDoor = secDoor;
         this.treasureBoxes = treasureBoxes;
@@ -39,6 +42,8 @@ public class BattleRoom implements Room {
         this.rivers.addAll(rivers);
         this.bulletKins = bulletKins;
         this.ashenBulletKins = ashenBulletKins;
+        this.basket = basket;
+        this.table = table;
     }
     public Doors getPriDoors() { return priDoor; }
     public Doors getSecDoors() { return secDoor; }
@@ -49,14 +54,18 @@ public class BattleRoom implements Room {
         bg.draw(width/2.0,height/2.0);
         priDoor.show();
         secDoor.show();
+        if(basket.isAlive()) basket.show();
+        if(table.isAlive()) table.show();
         for(TreasureBox t:treasureBoxes) if(!t.getOpen()) t.show();
         for(Wall w:walls) { w.show(); }
         for(River r : rivers) { r.show(); }
         for(Bullet b : bullets) { b.show(); }
         for(Fireball f : fireballs) { f.show(); }
-        for(BulletKin bk : bulletKins) { bk.show(); }
-        for(AshenBulletKin k : ashenBulletKins) k.show();
-        if(gateDelay && keyBulletKin.isAlive()) keyBulletKin.show();
+        if(gateDelay) {
+            for(BulletKin bk : bulletKins) { bk.show(); }
+            for(AshenBulletKin k : ashenBulletKins) k.show();
+            if(keyBulletKin.isAlive()) keyBulletKin.show();
+        }
     }
     public int clashTest(Player player) {
         if(!priDoor.clash(player) && !secDoor.clash(player)) gateDelay = true;
@@ -93,8 +102,10 @@ public class BattleRoom implements Room {
         fireballs.clear();
         bullets.clear();
         gateDelay = false;
+        passed = false;
+        basket.reset(); table.reset();
     }
-    public void shot(Player player){
+    public void shotFireball(Player player){
         for(BulletKin bk:bulletKins) {
             if(bk.isAlive()){
                 if(bk.getCoolDown() == 0){
@@ -125,11 +136,12 @@ public class BattleRoom implements Room {
         bullets.add(new Bullet(playerPos,speedX,speedY,player.getHurtPerShot()));
     }
     public void move(){
+        if(!gateDelay) return ;
         keyBulletKin.move();
         for(Fireball fb:fireballs) { fb.move(); }
         for(Bullet bb:bullets) { bb.move(); }
     }
-    public void fireballClashTest(Player player){
+    public void projectilesClashTest(Player player){
         for(int i = 0; i < fireballs.size(); i++) {
             if(priDoor.clashFireball(fireballs.get(i))){
                 fireballs.remove(fireballs.get(i)); continue;
@@ -153,14 +165,22 @@ public class BattleRoom implements Room {
         for(int i = 0; i < bullets.size(); i++) {
             int flag = 0;
             if(priDoor.clashBullet(bullets.get(i))){
-                bullets.remove(i); continue;
+                bullets.remove(bullets.get(i)); continue;
             }
             if(secDoor.clashBullet(bullets.get(i))){
-                bullets.remove(i); continue;
+                bullets.remove(bullets.get(i)); continue;
             }
             if(keyBulletKin.clashBullet(bullets.get(i)) && keyBulletKin.isAlive()){
                 keyBulletKin.dead(); player.gainKey();
-                bullets.remove(i); continue;
+                bullets.remove(bullets.get(i)); continue;
+            }
+            if(basket.clashBullet(bullets.get(i)) && basket.isAlive()){
+                basket.dead(); player.gainCoin(basket.getCoin());
+                bullets.remove(bullets.get(i)); continue;
+            }
+            if(table.clashBullet(bullets.get(i)) && table.isAlive()){
+                table.dead();
+                bullets.remove(bullets.get(i)); continue;
             }
             for(int j = 0; j < walls.size(); j++) {
                 if(walls.get(j).clashBullet(bullets.get(i))){
@@ -202,4 +222,7 @@ public class BattleRoom implements Room {
         if(num == numDead) { priDoor.setterOpen(); secDoor.setterOpen(); player.setWin(player.getWin() + 1); passed = true; }
     }
     public void clean(){ bullets.clear(); }
+    public Basket getBasket() { return basket; }
+    public Table getTable() { return table; }
+    public Boolean getGateDelay(){ return gateDelay; }
 }

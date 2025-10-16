@@ -102,4 +102,5 @@ public class PrepRoom implements Room {
     }
     public void clean(){ bullets.clear(); }
     public void move(){ for(Bullet bb:bullets) { bb.move(); } }
+    public Boolean getGateDelay(){ return gateDelay; }
 }

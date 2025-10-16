@@ -62,7 +62,9 @@ public class ShadowDungeon extends AbstractGame {
         List<River> tmpRivers = IOUtils.parseRivers(GAME_PROPS.getProperty("river.A"));
         List<BulletKin> tmpBulletKin = IOUtils.parseBulletKin(GAME_PROPS.getProperty("bulletKin.A"), GAME_PROPS, MESSAGE_PROPS);
         List<AshenBulletKin> tmpAshenBulletKin = IOUtils.parseAshenBulletKin(GAME_PROPS.getProperty("ashenBulletKin.A"), GAME_PROPS, MESSAGE_PROPS);
-        roomA = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers,tmpBulletKin,tmpAshenBulletKin);
+        Basket tmpBasket = IOUtils.parseBasket(GAME_PROPS.getProperty("basket.A"),Integer.parseInt(GAME_PROPS.getProperty("basketCoin")));
+        Table tmpTable = IOUtils.parseTable(GAME_PROPS.getProperty("table.A"),0);
+        roomA = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers,tmpBulletKin,tmpAshenBulletKin,tmpBasket,tmpTable);
         //Create the roomB object
         tmpPri = IOUtils.parseDoors(GAME_PROPS.getProperty("primarydoor.B"));
         tmpSec = IOUtils.parseDoors(GAME_PROPS.getProperty("secondarydoor.B"));
@@ -72,7 +74,9 @@ public class ShadowDungeon extends AbstractGame {
         tmpRivers = IOUtils.parseRivers(GAME_PROPS.getProperty("river.B"));
         tmpBulletKin = IOUtils.parseBulletKin(GAME_PROPS.getProperty("bulletKin.B"), GAME_PROPS, MESSAGE_PROPS);
         tmpAshenBulletKin = IOUtils.parseAshenBulletKin(GAME_PROPS.getProperty("ashenBulletKin.B"), GAME_PROPS, MESSAGE_PROPS);
-        roomB = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers,tmpBulletKin,tmpAshenBulletKin);
+        tmpBasket = IOUtils.parseBasket(GAME_PROPS.getProperty("basket.B"),Integer.parseInt(GAME_PROPS.getProperty("basketCoin")));
+        tmpTable = IOUtils.parseTable(GAME_PROPS.getProperty("table.B"),0);
+        roomB = new BattleRoom(tmpPri,tmpSec,tmpTreasure,enemy,tmpWalls,tmpRivers,tmpBulletKin,tmpAshenBulletKin,tmpBasket,tmpTable);
         //Create the map between rooms and RoomType
         rooms.put(RoomType.PREP,prepRoom);
         rooms.put(RoomType.END,endRoom);
@@ -108,25 +112,29 @@ public class ShadowDungeon extends AbstractGame {
         }
         else{
             //Get the wall of the currentroom, it is used to make sure the player will not walk into the wall
-            List<Wall> solid = new ArrayList<>();
-            if(currentRoom == roomA) solid = roomA.getWalls();
-            if(currentRoom == roomB) solid = roomB.getWalls();
+            List<Wall> solid = roomA.getWalls();
+            Basket tmpBasket = roomA.getBasket();
+            Table tmpTable = roomA.getTable();
+            if(currentRoom == roomB) { solid = roomB.getWalls(); tmpBasket = roomB.getBasket(); tmpTable = roomB.getTable(); }
             if(input.isDown(Keys.R) || input.isDown(Keys.M)){
                 prepRoom.getSecDoors().setterOpen();
                 if(input.isDown(Keys.R)){ player.setRobot(); }
                 else if(input.isDown(Keys.M)){ player.setMarine(); }
             }
             player.shotCoolDown();
-            if(input.isDown(MouseButtons.LEFT) && player.getHasChosen() == true) player.shot(currentRoom,input);
+            if(input.wasPressed(MouseButtons.LEFT) && player.getHasChosen() == true) player.shot(currentRoom,input);
             currentRoom.move();
-            if(currentRoom == roomA) roomA.shot(player);
-            if(currentRoom == roomB) roomB.shot(player);
-            if(currentRoom == roomA) roomA.fireballClashTest(player);
-            if(currentRoom == roomB) roomB.fireballClashTest(player);
+            if(currentRoom == roomA && roomA.getGateDelay()) roomA.shotFireball(player);
+            if(currentRoom == roomB && roomB.getGateDelay()) roomB.shotFireball(player);
+            if(currentRoom == roomA) roomA.projectilesClashTest(player);
+            if(currentRoom == roomB) roomB.projectilesClashTest(player);
             if(currentRoom == roomA && roomA.getPassed() == false) roomA.winTest(player);
             if(currentRoom == roomB && roomB.getPassed() == false) roomB.winTest(player);
             player.setterBounds(player.getPlayerPos(input));
-            player.move(input,solid);
+            if(currentRoom == roomA || currentRoom == roomB){
+                player.move(input,solid,tmpBasket,tmpTable,currentRoom.getPriDoors(),currentRoom.getSecDoors(),currentRoom.getGateDelay());
+            }
+            else player.move(input,currentRoom.getPriDoors(),currentRoom.getSecDoors(),currentRoom.getGateDelay());
             int val = currentRoom.clashTest(player);
             //Deal with the clash with pridoor.
             if(val == 1){

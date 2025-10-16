@@ -124,4 +124,14 @@ public class IOUtils {
         }
         return rivers;
     }
+    public static Basket parseBasket(String coords,int coin) {
+        String[] coordinates = coords.split(",");
+        Point center = new Point(Double.parseDouble(coordinates[0]),Double.parseDouble(coordinates[1]));
+        return new Basket(center,coin);
+    }
+    public static Table parseTable(String coords,int coin) {
+        String[] coordinates = coords.split(",");
+        Point center = new Point(Double.parseDouble(coordinates[0]),Double.parseDouble(coordinates[1]));
+        return new Table(center,coin);
+    }
 }

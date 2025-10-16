@@ -15,4 +15,5 @@ public interface Room {
     void clean();
     void shotBullet(Player player, Input input);
     void move();
+    Boolean getGateDelay();
 }

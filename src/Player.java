@@ -21,7 +21,7 @@ public class Player {
     private int weaponLevel = 0;
     private int bulletFreq,coolDown;
     public double bulletSpeed;
-    private int killCoin;
+    private int killCoin,destroyBasketCoin;
     private double hurtPerShoot;
     private double initialX,initialY;
     private Messege messegeCoin,messegeHealth,messegeKey,messegeWeaponLevel;
@@ -67,6 +67,7 @@ public class Player {
         this.coolDown = bulletFreq;
         this.bulletSpeed = Double.parseDouble(GAME_PROPS.getProperty("bulletSpeed"));
         this.hurtPerShoot = Double.parseDouble(GAME_PROPS.getProperty("weaponStandardDamage"));
+        this.destroyBasketCoin = Integer.parseInt(GAME_PROPS.getProperty("basketCoin"));
     }
     public void show(Input input){
         if(input.getMouseX()>playerPos.x){
@@ -81,7 +82,7 @@ public class Player {
         messegeWeaponLevel.show();
     }
     //The move logic: when player move, use this method
-    public void move(Input input, List<Wall> walls){
+    public void move(Input input, List<Wall> walls,Basket tmpBasket,Table tmpTable,Doors priDoor, Doors secDoor,Boolean gateDelay){
         double dx = 0, dy = 0;
         if (input.isDown(Keys.W)) dy -= speed;
         if (input.isDown(Keys.S)) dy += speed;
@@ -98,18 +99,108 @@ public class Player {
                     break;
                 }
             }
+            if(tmpBasket.isAlive()){
+                if(tmpBasket.clash(this)){
+                    setterPosx(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(tmpTable.isAlive()){
+                if(tmpTable.clash(this)){
+                    setterPosx(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(!priDoor.getOpen() && gateDelay){
+                if(priDoor.clash(this)){
+                    setterPosx(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(!secDoor.getOpen() && gateDelay){
+                if(secDoor.clash(this)){
+                    setterPosx(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
             clampX(input);
         }
         if (dy != 0){
             double old = playerPos.y;
             setterPosy(old + dy);
             setterBounds(getPlayerPos(input));
-
             for (Wall wall : walls){
                 if (wall.clash(this)){
                     setterPosy(old);
                     setterBounds(getPlayerPos(input));
                     break;
+                }
+            }
+            if(tmpBasket.isAlive()) {
+                if(tmpBasket.clash(this)){
+                    setterPosy(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(tmpTable.isAlive()) {
+                if(tmpTable.clash(this)){
+                    setterPosy(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(!priDoor.getOpen() && gateDelay){
+                if(priDoor.clash(this)){
+                    setterPosy(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(!secDoor.getOpen() && gateDelay){
+                if(secDoor.clash(this)){
+                    setterPosy(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            clampY(input);
+        }
+    }
+    public void move(Input input,Doors priDoor, Doors secDoor,Boolean gateDelay){
+        double dx = 0, dy = 0;
+        if (input.isDown(Keys.W)) dy -= speed;
+        if (input.isDown(Keys.S)) dy += speed;
+        if (input.isDown(Keys.A)) dx -= speed;
+        if (input.isDown(Keys.D)) dx += speed;
+        if (dx != 0){
+            double old = playerPos.x;
+            setterPosx(old + dx);
+            setterBounds(getPlayerPos(input));
+            if(!priDoor.getOpen() && gateDelay){
+                if(priDoor.clash(this)){
+                    setterPosx(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(!secDoor.getOpen() && gateDelay){
+                if(secDoor.clash(this)){
+                    setterPosx(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            clampX(input);
+        }
+        if (dy != 0){
+            double old = playerPos.y;
+            setterPosy(old + dy);
+            setterBounds(getPlayerPos(input));
+            if(!priDoor.getOpen() && gateDelay){
+                if(priDoor.clash(this)){
+                    setterPosy(old);
+                    setterBounds(getPlayerPos(input));
+                }
+            }
+            if(!secDoor.getOpen() && gateDelay){
+                if(secDoor.clash(this)){
+                    setterPosy(old);
+                    setterBounds(getPlayerPos(input));
                 }
             }
             clampY(input);
@@ -198,6 +289,7 @@ public class Player {
         playerLeft = new Image("res/player_left.png");
         playerRight = new Image("res/player_right.png");
         hasChosen = false;
+        weaponLevel = 0; messegeWeaponLevel.setNum(weaponLevel);
     }
     public void setMarine(){
         hasChosen = true;
@@ -229,6 +321,7 @@ public class Player {
     public int getCoin() { return coin; }
     public void useCoin(int coin){ this.coin -= coin; messegeCoin.setNum(this.coin); }
     public void gainHealth(double health){ this.health += health; messegeHealth.setNum(this.health); }
+    public void gainCoin (int Coin) { this.coin += Coin; messegeCoin.setNum(this.coin); }
     public int getWeaponLevel(){ return weaponLevel; }
     public void setHurtPerShoot(double hurtPerShoot){
         weaponLevel ++; this.hurtPerShoot = hurtPerShoot;
