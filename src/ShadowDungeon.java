@@ -11,7 +11,6 @@ import static java.lang.Math.min;
 public class ShadowDungeon extends AbstractGame {
     private final Properties GAME_PROPS;
     private final Properties MESSAGE_PROPS;
-
     private Room currentRoom;
     private PrepRoom prepRoom;
     private BattleRoom roomA, roomB;
@@ -19,9 +18,7 @@ public class ShadowDungeon extends AbstractGame {
     private Player player;
     private Store store;
     private boolean pause;
-
     private final Map<RoomType, Room> rooms = new EnumMap<>(RoomType.class);
-
     /**
      * Constructs the ShadowDungeon game: loads properties, creates player and rooms, sets initial state.
      * @param gameProps runtime configuration
@@ -87,7 +84,6 @@ public class ShadowDungeon extends AbstractGame {
         currentRoom = prepRoom;
         this.store = new Store(GAME_PROPS);
     }
-
     /**
      * Render the relevant screen based on the keyboard input given by the user and the status of the gameplay.
      * @param input The current mouse/keyboard input.
@@ -102,7 +98,6 @@ public class ShadowDungeon extends AbstractGame {
             currentRoom.show(input);
             player.show(input);
             store.show();
-
             if (input.wasPressed(Keys.L)) {
                 store.buyForWeapon(player);
             } else if (input.wasPressed(Keys.E)) {
@@ -127,7 +122,6 @@ public class ShadowDungeon extends AbstractGame {
                 tmpBasket = roomB.getBasket();
                 tmpTable = roomB.getTable();
             }
-
             // Character selection
             if (input.isDown(Keys.R) || input.isDown(Keys.M)) {
                 prepRoom.getSecDoors().setterOpen();

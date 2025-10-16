@@ -75,21 +75,26 @@ public class BattleRoom implements Room {
      * @param input The current keyboard/mouse input.
      */
     public void show(Input input){
+        // Draw background and static props
         bg.draw(width/2.0,height/2.0);
         priDoor.show();
         secDoor.show();
         if(basket.isAlive()) basket.show();
         if(table.isAlive()) table.show();
+        // Draw interactables and environment
         for(TreasureBox t:treasureBoxes) if(!t.getOpen()) t.show();
         for(Wall w:walls) { w.show(); }
         for(River r : rivers) { r.show(); }
+        // Draw projectiles
         for(Bullet b : bullets) { b.show(); }
         for(Fireball f : fireballs) { f.show(); }
+        // Draw enemies only when combat is enabled (after gates close)
         if(gateDelay) {
             for(BulletKin bk : bulletKins) { bk.show(); }
             for(AshenBulletKin k : ashenBulletKins) k.show();
             if(keyBulletKin.isAlive()) keyBulletKin.show();
         }
+        // Draw dropped key if available
         if(haveKey) key.show();
     }
     /**
@@ -98,16 +103,22 @@ public class BattleRoom implements Room {
      * @return 1 enter priDoor, 3 enter secDoor, 4 river hurt, 5 treasure nearby, 6 enemy contact, 0 none.
      */
     public int clashTest(Player player) {
+        // Pick up key if the player touches it
         if(haveKey){
             if(key.clash(player) && key.isAlive()){
                 player.gainKey(); haveKey = false; key.dead();
             }
         }
+        // Gate delay starts after leaving both door triggers once
         if(!priDoor.clash(player) && !secDoor.clash(player)) gateDelay = true;
+        // Allow transition only when door is open and gateDelay true
         if(priDoor.clash(player) && priDoor.getOpen() && gateDelay ) return 1;
         if(secDoor.clash(player) && secDoor.getOpen() && gateDelay) return 3;
+        // Environmental hazard: rivers
         for(River r : rivers) { if(r.clash(player)) return 4; }
+        // Near treasure box
         for(TreasureBox t:treasureBoxes) { if(t.clash(player)) return 5; }
+        // Touching any enemy
         for(AshenBulletKin a:ashenBulletKins) { if(a.clash(player) && a.isAlive() ) return 6; }
         for(BulletKin b:bulletKins) { if(b.clash(player) && b.isAlive() ) return 6; }
         if(keyBulletKin.clash(player) && keyBulletKin.isAlive()) return 6;
@@ -124,6 +135,7 @@ public class BattleRoom implements Room {
      * @param backflag true if entering from secondary door.
      */
     public void entry(Player player,Boolean backflag) {
+        // Snap player to the appropriate door spawn point
         if(backflag) {
             player.setterPosx(secDoor.getPosX());
             player.setterPosy(secDoor.getPosY());
@@ -132,20 +144,24 @@ public class BattleRoom implements Room {
             player.setterPosx(priDoor.getPosX());
             player.setterPosy(priDoor.getPosY());
         }
+        // Reset gate state on entry
         gateDelay = false;
     }
     /**
      * Reset room state to initial values.
      */
     public void reset(){
+        // Reset doors and enemies
         priDoor.reset();
         secDoor.reset();
         keyBulletKin.reset();
         for(BulletKin bk : bulletKins) { bk.reset(); }
         for(AshenBulletKin k : ashenBulletKins) {k.reset(); }
+        // Reset interactables and clear projectiles
         for(TreasureBox t:treasureBoxes) { t.reset(); }
         fireballs.clear();
         bullets.clear();
+        // Reset flags and destructibles
         gateDelay = false;
         passed = false; haveKey = false;
         basket.reset(); table.reset();
@@ -155,6 +171,7 @@ public class BattleRoom implements Room {
      * @param player The player target.
      */
     public void shotFireball(Player player){
+        // BulletKin shooting logic with cooldown
         for(BulletKin bk:bulletKins) {
             if(bk.isAlive()){
                 if(bk.getCoolDown() == 0){
@@ -164,6 +181,7 @@ public class BattleRoom implements Room {
                 else bk.setCoolDown(bk.getCoolDown() - 1);
             }
         }
+        // AshenBulletKin shooting logic with cooldown
         for(AshenBulletKin k:ashenBulletKins) {
             if(k.isAlive()){
                 if(k.getCoolDown() == 0){
@@ -180,6 +198,7 @@ public class BattleRoom implements Room {
      * @param input The current input.
      */
     public void shotBullet(Player player,Input input){
+        // Compute normalized direction from player to mouse and scale by bullet speed
         Point playerPos =  new Point(player.getPosX(),player.getPosY());
         Point mousePos = input.getMousePosition();
         double speedX,speedY,disX,disY;
@@ -203,18 +222,22 @@ public class BattleRoom implements Room {
      * @param player The player to test against enemy fireballs.
      */
     public void projectilesClashTest(Player player){
+        // --- Enemy fireballs ---
         for(int i = 0; i < fireballs.size(); i++) {
+            // Blocked by closed doors
             if(priDoor.clashFireball(fireballs.get(i))){
                 fireballs.remove(fireballs.get(i)); continue;
             }
             if(secDoor.clashFireball(fireballs.get(i))){
                 fireballs.remove(fireballs.get(i)); continue;
             }
+            // Hit player
             if(fireballs.get(i).clash(player)) {
                 player.injured(fireballs.get(i).getDamage());
                 fireballs.remove(i);
                 i--; continue;
             }
+            // Hit any wall
             for(int j = 0; j < walls.size(); j++) {
                 if(walls.get(j).clashFireball(fireballs.get(i))){
                     fireballs.remove(fireballs.get(i));
@@ -223,18 +246,22 @@ public class BattleRoom implements Room {
                 }
             }
         }
+        // --- Player bullets ---
         for(int i = 0; i < bullets.size(); i++) {
             int flag = 0;
+            // Blocked by closed doors
             if(priDoor.clashBullet(bullets.get(i))){
                 bullets.remove(bullets.get(i)); continue;
             }
             if(secDoor.clashBullet(bullets.get(i))){
                 bullets.remove(bullets.get(i)); continue;
             }
+            // Hit key enemy: drop key
             if(keyBulletKin.clashBullet(bullets.get(i)) && keyBulletKin.isAlive()){
                 keyBulletKin.dead(); key = new Key(keyBulletKin.getPos()); haveKey = true;
                 bullets.remove(bullets.get(i)); continue;
             }
+            // Hit destructible props
             if(basket.clashBullet(bullets.get(i)) && basket.isAlive()){
                 basket.dead(); player.gainCoin(basket.getCoin());
                 bullets.remove(bullets.get(i)); continue;
@@ -243,6 +270,7 @@ public class BattleRoom implements Room {
                 table.dead();
                 bullets.remove(bullets.get(i)); continue;
             }
+            // Hit any wall
             for(int j = 0; j < walls.size(); j++) {
                 if(walls.get(j).clashBullet(bullets.get(i))){
                     bullets.remove(bullets.get(i));
@@ -251,6 +279,7 @@ public class BattleRoom implements Room {
                 }
             }
             if(flag == 1) continue;
+            // Hit a BulletKin
             for(int j = 0 ; j < bulletKins.size(); j++) {
                 if(!bulletKins.get(j).isalive) continue;
                 if(bulletKins.get(j).clashBullet(bullets.get(i))){
@@ -261,6 +290,7 @@ public class BattleRoom implements Room {
                 }
             }
             if(flag == 1) continue;
+            // Hit an AshenBulletKin
             for(int j = 0 ; j < ashenBulletKins.size(); j++) {
                 if(!ashenBulletKins.get(j).isalive) continue;
                 if(ashenBulletKins.get(j).clashBullet(bullets.get(i))){
@@ -283,11 +313,13 @@ public class BattleRoom implements Room {
      * @param player The player to reward with a win count.
      */
     public void winTest(Player player){
+        // Count total enemies (including key holder) and how many are dead
         int num = ashenBulletKins.size() + bulletKins.size() + 1;
         int numDead = 0;
         for(BulletKin bk:bulletKins) { if(!bk.isalive) numDead++; }
         for(AshenBulletKin abk:ashenBulletKins) { if(!abk.isalive) numDead++; }
         if(!keyBulletKin.isalive) { numDead++; }
+        // If all defeated, open doors and mark room as passed
         if(num == numDead) { priDoor.setterOpen(); secDoor.setterOpen(); player.setWin(player.getWin() + 1); passed = true; }
     }
     /**

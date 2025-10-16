@@ -42,27 +42,51 @@ public class PrepRoom implements Room {
         this.robotImage = new Image("res/robot_sprite.png");
         this.marinePos = marinePos;
         this.robotPos = robotPos;
-        title = new Messege(MESSAGE_PROPS.getProperty("title"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("title.fontSize"))), new Point(Window.getWidth() / 2.0, Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true, false);
-        moveMessege = new Messege(MESSAGE_PROPS.getProperty("moveMessage"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("prompt.fontSize"))), new Point(Window.getWidth() / 2.0, Double.parseDouble(GAME_PROPS.getProperty("moveMessage.y"))), -1.0, true, false);
-        marineMessege = new Messege(MESSAGE_PROPS.getProperty("marineDescription"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), marineMessegePos, -1, false, false);
-        robotMessege = new Messege(MESSAGE_PROPS.getProperty("robotDescription"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), robotMessegePos, -1, false, false);
-        selectMessege = new Messege(MESSAGE_PROPS.getProperty("selectMessage"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("prompt.fontSize"))), new Point(Window.getWidth() / 2.0, Double.parseDouble(GAME_PROPS.getProperty("selectMessage.y"))), -1, true, false);
+        title = new Messege
+                (MESSAGE_PROPS.getProperty("title"), new Font(GAME_PROPS.getProperty("font"),
+                        Integer.parseInt(GAME_PROPS.getProperty("title.fontSize"))), new Point(Window.getWidth() / 2.0,
+                        Double.parseDouble(GAME_PROPS.getProperty("title.y"))), -1.0, true, false
+                );
+        moveMessege = new Messege
+                (MESSAGE_PROPS.getProperty("moveMessage"), new Font(GAME_PROPS.getProperty("font"),
+                        Integer.parseInt(GAME_PROPS.getProperty("prompt.fontSize"))), new Point(Window.getWidth() / 2.0,
+                        Double.parseDouble(GAME_PROPS.getProperty("moveMessage.y"))), -1.0, true, false
+                );
+        marineMessege = new Messege
+                (MESSAGE_PROPS.getProperty("marineDescription"), new Font(GAME_PROPS.getProperty("font"),
+                        Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), marineMessegePos,
+                        -1, false, false
+                );
+        robotMessege = new Messege
+                (MESSAGE_PROPS.getProperty("robotDescription"), new Font(GAME_PROPS.getProperty("font"),
+                        Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), robotMessegePos,
+                        -1, false, false
+                );
+        selectMessege = new Messege
+                (MESSAGE_PROPS.getProperty("selectMessage"), new Font(GAME_PROPS.getProperty("font"),
+                        Integer.parseInt(GAME_PROPS.getProperty("prompt.fontSize"))), new Point(Window.getWidth() / 2.0,
+                        Double.parseDouble(GAME_PROPS.getProperty("selectMessage.y"))), -1, true, false
+                );
     }
     /**
      * Display all elements of the preparation room.
      * @param input The player's input.
      */
     public void show(Input input) {
+        // Background and static zones
         bg.draw(width / 2, height / 2);
         restartArea.show();
         doorToA.show();
+        // Text/UI messages
         title.show();
         moveMessege.show();
         marineMessege.show();
         robotMessege.show();
         selectMessege.show();
+        // Character previews
         marineImage.draw(marinePos.x, marinePos.y);
         robotImage.draw(robotPos.x, robotPos.y);
+        // Bullets (if any)
         for (Bullet bullet : bullets) { bullet.show(); }
     }
     /**
@@ -81,8 +105,11 @@ public class PrepRoom implements Room {
      * @return A flag representing the collision result.
      */
     public int clashTest(Player player) {
+        // Enable gateDelay only after the player leaves the door area
         if (!doorToA.clash(player)) { gateDelay = true; }
+        // Allow transition if the door is open and gateDelay has been set
         if (doorToA.clash(player) && doorToA.getOpen() && gateDelay) return 3;
+        // Restart area detection
         if (restartArea.clash(player)) return 2;
         return 0;
     }
@@ -92,8 +119,10 @@ public class PrepRoom implements Room {
      * @param backflag Whether the player comes from the back door.
      */
     public void entry(Player player, Boolean backflag) {
+        // Place player at door position
         player.setterPosx(doorToA.getPosX());
         player.setterPosy(doorToA.getPosY());
+        // Reset gating to require leaving door area before re-entering
         gateDelay = false;
     }
     /**
@@ -109,13 +138,15 @@ public class PrepRoom implements Room {
      * @param input The player's current input.
      */
     public void shotBullet(Player player, Input input) {
+        // Compute direction from player to mouse and normalize
         Point playerPos = new Point(player.getPosX(), player.getPosY());
         Point mousePos = input.getMousePosition();
         double speedX, speedY, disX, disY;
         disX = mousePos.x - player.getPosX();
         disY = mousePos.y - player.getPosY();
-        speedX = player.getBulletSpeed() * disX / sqrt(disX * disX + disY * disY);
-        speedY = player.getBulletSpeed() * disY / sqrt(disX * disX + disY * disY);
+        double len = sqrt(disX * disX + disY * disY); // avoid repeated sqrt
+        speedX = player.getBulletSpeed() * disX / len;
+        speedY = player.getBulletSpeed() * disY / len;
         bullets.add(new Bullet(playerPos, speedX, speedY, player.getHurtPerShot()));
     }
     /**

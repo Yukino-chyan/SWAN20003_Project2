@@ -48,11 +48,14 @@ public class EndRoom implements Room {
      * @param input The current keyboard/mouse input.
      */
     public void show(Input input) {
+        // Draw background and static interactables
         bg.draw(width / 2, height / 2);
         restartArea.show();
         doorToB.show();
+        // Choose which end message to display
         if (!winFlag) gameoverMessege.show();
         else congratesMessege.show();
+        // Render any bullets present
         for (Bullet bullet : bullets) bullet.show();
     }
     /**
@@ -61,6 +64,7 @@ public class EndRoom implements Room {
      */
     public void setWinFlag(boolean winFlag) {
         this.winFlag = winFlag;
+        // Open the door automatically on win
         if (winFlag) doorToB.setterOpen();
     }
     /**
@@ -79,8 +83,11 @@ public class EndRoom implements Room {
      * @return An integer code: 1 if door triggered, 2 if restart area, 0 otherwise.
      */
     public int clashTest(Player player) {
+        // Enable transitions only after the player steps away once
         if (!doorToB.clash(player)) gateDelay = true;
+        // Door interaction once gateDelay is active
         if (doorToB.clash(player) && gateDelay) return 1;
+        // Restart area interaction
         if (restartArea.clash(player)) return 2;
         return 0;
     }
@@ -90,14 +97,17 @@ public class EndRoom implements Room {
      * @param backflag true if entering from the back door.
      */
     public void entry(Player player, Boolean backflag) {
+        // Spawn player at the door position; backflag is ignored here
         player.setterPosx(doorToB.getPosX());
         player.setterPosy(doorToB.getPosY());
+        // Reset gate delay on entry
         gateDelay = false;
     }
     /**
      * Reset the door and gate delay.
      */
     public void reset() {
+        // Close door and clear transition state
         doorToB.reset();
         gateDelay = false;
     }
@@ -111,6 +121,7 @@ public class EndRoom implements Room {
      * @param input The current input.
      */
     public void shotBullet(Player player, Input input) {
+        // Compute normalized direction from player to mouse and scale by bullet speed
         Point playerPos = new Point(player.getPosX(), player.getPosY());
         Point mousePos = input.getMousePosition();
         double disX = mousePos.x - player.getPosX();

@@ -40,6 +40,7 @@ public class Player {
      * @param killCoin The extra coins gained per kill.
      */
     public Player(Point playerPos, int coin, int health, int speed, Properties GAME_PROPS, Properties MESSAGE_PROPS, Image playerLeft, Image playerRight, double hurtPerFrame, int killCoin) {
+        // Cache sprites, initial stats and configuration
         this.playerLeft = playerLeft;
         this.playerRight = playerRight;
         this.playerPos = playerPos;
@@ -48,10 +49,12 @@ public class Player {
         this.speed = speed;
         this.GAME_PROPS = GAME_PROPS;
         this.MESSAGE_PROPS = MESSAGE_PROPS;
+        // Create HUD messages
         messegeCoin = new Messege(MESSAGE_PROPS.getProperty("coinDisplay"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), IOUtils.parseCoords(GAME_PROPS.getProperty("coinStat")), coin, false, false);
         messegeHealth = new Messege(MESSAGE_PROPS.getProperty("healthDisplay"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), IOUtils.parseCoords(GAME_PROPS.getProperty("healthStat")), health, false, true);
         messegeKey = new Messege(MESSAGE_PROPS.getProperty("keyDisplay"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), IOUtils.parseCoords(GAME_PROPS.getProperty("keyStat")), key, false, false);
         messegeWeaponLevel = new Messege(MESSAGE_PROPS.getProperty("weaponDisplay"), new Font(GAME_PROPS.getProperty("font"), Integer.parseInt(GAME_PROPS.getProperty("playerStats.fontSize"))), IOUtils.parseCoords(GAME_PROPS.getProperty("weaponStat")), weaponLevel, false, false);
+        // Gameplay numbers
         this.hurtPerFrame = hurtPerFrame;
         this.killCoin = killCoin;
         this.initialX = playerPos.x;
@@ -67,8 +70,10 @@ public class Player {
      * @param input The current input.
      */
     public void show(Input input) {
+        // Draw facing based on mouse x relative to player
         if (input.getMouseX() > playerPos.x) playerRight.draw(playerPos.x, playerPos.y);
         else if (input.getMouseX() < playerPos.x) playerLeft.draw(playerPos.x, playerPos.y);
+        // Draw HUD
         messegeCoin.show();
         messegeHealth.show();
         messegeKey.show();
@@ -85,31 +90,42 @@ public class Player {
      * @param gateDelay Whether doors should block the player currently.
      */
     public void move(Input input, List<Wall> walls, Basket tmpBasket, Table tmpTable, Doors priDoor, Doors secDoor, Boolean gateDelay) {
+        // Read input to build desired delta
         double dx = 0, dy = 0;
         if (input.isDown(Keys.W)) dy -= speed;
         if (input.isDown(Keys.S)) dy += speed;
         if (input.isDown(Keys.A)) dx -= speed;
         if (input.isDown(Keys.D)) dx += speed;
+        // Horizontal step: move tentatively, then resolve collisions and clamp
         if (dx != 0) {
             double old = playerPos.x;
             setterPosx(old + dx);
             setterBounds(getPlayerPos(input));
+            // Resolve wall collision
             for (Wall wall : walls) { if (wall.clash(this)) { setterPosx(old); setterBounds(getPlayerPos(input)); break; } }
+            // Resolve destructible collisions
             if (tmpBasket.isAlive() && tmpBasket.clash(this)) { setterPosx(old); setterBounds(getPlayerPos(input)); }
             if (tmpTable.isAlive() && tmpTable.clash(this)) { setterPosx(old); setterBounds(getPlayerPos(input)); }
+            // Resolve closed doors when gateDelay applies
             if (!priDoor.getOpen() && gateDelay && priDoor.clash(this)) { setterPosx(old); setterBounds(getPlayerPos(input)); }
             if (!secDoor.getOpen() && gateDelay && secDoor.clash(this)) { setterPosx(old); setterBounds(getPlayerPos(input)); }
+            // Keep within screen bounds
             clampX(input);
         }
+        // Vertical step: same as above but in Y
         if (dy != 0) {
             double old = playerPos.y;
             setterPosy(old + dy);
             setterBounds(getPlayerPos(input));
+            // Resolve wall collision
             for (Wall wall : walls) { if (wall.clash(this)) { setterPosy(old); setterBounds(getPlayerPos(input)); break; } }
+            // Resolve destructible collisions
             if (tmpBasket.isAlive() && tmpBasket.clash(this)) { setterPosy(old); setterBounds(getPlayerPos(input)); }
             if (tmpTable.isAlive() && tmpTable.clash(this)) { setterPosy(old); setterBounds(getPlayerPos(input)); }
+            // Resolve closed doors when gateDelay applies
             if (!priDoor.getOpen() && gateDelay && priDoor.clash(this)) { setterPosy(old); setterBounds(getPlayerPos(input)); }
             if (!secDoor.getOpen() && gateDelay && secDoor.clash(this)) { setterPosy(old); setterBounds(getPlayerPos(input)); }
+            // Keep within screen bounds
             clampY(input);
         }
     }
@@ -121,11 +137,13 @@ public class Player {
      * @param gateDelay Whether doors should block the player currently.
      */
     public void move(Input input, Doors priDoor, Doors secDoor, Boolean gateDelay) {
+        // Read input to build desired delta
         double dx = 0, dy = 0;
         if (input.isDown(Keys.W)) dy -= speed;
         if (input.isDown(Keys.S)) dy += speed;
         if (input.isDown(Keys.A)) dx -= speed;
         if (input.isDown(Keys.D)) dx += speed;
+        // Horizontal movement with door collision only
         if (dx != 0) {
             double old = playerPos.x;
             setterPosx(old + dx);
@@ -134,6 +152,7 @@ public class Player {
             if (!secDoor.getOpen() && gateDelay && secDoor.clash(this)) { setterPosx(old); setterBounds(getPlayerPos(input)); }
             clampX(input);
         }
+        // Vertical movement with door collision only
         if (dy != 0) {
             double old = playerPos.y;
             setterPosy(old + dy);
@@ -148,6 +167,7 @@ public class Player {
      * @param input The current input.
      */
     private void clampX(Input input) {
+        // Compute half-width from current bounds and correct overflow
         Rectangle b = getterBounds();
         double halfW = (b.right() - b.left()) / 2.0;
         if (b.left() < 0) { setterPosx(halfW); setterBounds(getPlayerPos(input)); }
@@ -158,6 +178,7 @@ public class Player {
      * @param input The current input.
      */
     private void clampY(Input input) {
+        // Compute half-height from current bounds and correct overflow
         Rectangle b = getterBounds();
         double halfH = (b.bottom() - b.top()) / 2.0;
         if (b.top() < 0) { setterPosy(halfH); setterBounds(getPlayerPos(input)); }
@@ -310,6 +331,7 @@ public class Player {
      * @param input The current input.
      */
     public void shot(Room room, Input input) {
+        // Early out when still cooling down; otherwise reset cooldown and emit a shot
         if (coolDown != 0) return;
         else coolDown = bulletFreq;
         room.shotBullet(this, input);
@@ -318,18 +340,22 @@ public class Player {
      * Reset the player to initial state.
      */
     public void reset() {
+        // Reset basic stats and HUD
         coin = 0;
         health = 100.0;
         messegeCoin.setNum(coin);
         messegeHealth.setNum(health);
+        // Reset progress
         win = 0;
         key = 0;
         messegeKey.setNum(key);
+        // Reset position and sprites
         setterPosx(initialX);
         setterPosy(initialY);
         playerLeft = new Image("res/player_left.png");
         playerRight = new Image("res/player_right.png");
         hasChosen = false;
+        // Reset weapon
         weaponLevel = 0;
         messegeWeaponLevel.setNum(weaponLevel);
     }
@@ -337,6 +363,7 @@ public class Player {
      * Switch to Marine form (no river damage, no extra kill coin).
      */
     public void setMarine() {
+        // Change sprites and form-specific attributes
         hasChosen = true;
         playerLeft = new Image("res/marine_left.png");
         playerRight = new Image("res/marine_right.png");
@@ -347,6 +374,7 @@ public class Player {
      * Switch to Robot form (takes river damage, gains extra kill coin).
      */
     public void setRobot() {
+        // Change sprites and form-specific attributes from config
         hasChosen = true;
         playerLeft = new Image("res/robot_left.png");
         playerRight = new Image("res/robot_right.png");
