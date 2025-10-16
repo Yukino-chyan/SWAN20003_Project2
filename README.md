@@ -62,6 +62,8 @@ I call player.reset(), prepRoom.reset(), roomA.reset(), roomB.reset(), endRoom.r
 On any room transition I also call currentRoom.clean() to drop lingering projectiles.
 
 ## Assumptions
+About the shoot of the player, I assume that the player can't shoot continuously.So I
+use "waspressed" not "isDown".
 
-There are no any assumptions here, all the results are similar to those in the demonstration video.
+Assume that player can shoot and open the store in any room.
 
